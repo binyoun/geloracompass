@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Embodied Resurrection</title>
+    <title>Gelora - Ground Awareness</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -24,490 +24,389 @@
             z-index: 999;
         }
         
-        .movement-instructions {
+        .ground-instructions {
             position: absolute;
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
-            color: rgba(255,255,255,0.9);
-            padding: 12px 20px;
-            border-radius: 20px;
-            text-align: center;
-            font-size: 12px;
-            max-width: 70%;
-            backdrop-filter: blur(5px);
-            font-weight: 300;
-        }
-        
-        .body-guide {
-            position: absolute;
-            top: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.4);
             color: rgba(255,255,255,0.8);
-            padding: 8px 15px;
+            padding: 8px 16px;
             border-radius: 15px;
-            font-size: 10px;
-            backdrop-filter: blur(3px);
-            font-weight: 300;
             text-align: center;
-        }
-        
-        .movement-counter {
-            position: absolute;
-            top: 120px;
-            right: 25px;
-            background: rgba(0,0,0,0.5);
-            color: rgba(255,255,255,0.8);
-            padding: 8px 12px;
-            border-radius: 12px;
-            font-weight: 300;
             font-size: 10px;
             backdrop-filter: blur(3px);
+            font-weight: 300;
         }
         
-        /* Movement detection zones */
-        .movement-zone {
+        .awareness-counter {
             position: absolute;
-            pointer-events: all;
-            background: rgba(255,255,255,0.05);
-            border: 1px dashed rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            top: 70px;
+            right: 20px;
+            background: rgba(0,0,0,0.3);
             color: rgba(255,255,255,0.7);
-            font-size: 10px;
+            padding: 5px 8px;
+            border-radius: 8px;
             font-weight: 300;
-            text-align: center;
-            transition: all 0.3s;
+            font-size: 9px;
+            backdrop-filter: blur(2px);
         }
         
-        .movement-zone:active {
-            background: rgba(255,255,255,0.2);
-        }
-        
-        .zone-east {
-            right: 5%;
-            top: 30%;
-            width: 20%;
-            height: 40%;
-            border-left: none;
-        }
-        
-        .zone-west {
-            left: 5%;
-            top: 30%;
-            width: 20%;
-            height: 40%;
-            border-right: none;
-        }
-        
-        .zone-north {
-            top: 10%;
-            left: 30%;
-            width: 40%;
-            height: 20%;
-            border-bottom: none;
-        }
-        
-        .zone-south {
-            bottom: 10%;
-            left: 30%;
-            width: 40%;
-            height: 20%;
-            border-top: none;
-        }
-        
-        /* Swirling resurrection pulses */
-        .resurrection-pulse {
+        /* Glowing dots positioned on ground */
+        .glowing-dot {
             position: absolute;
-            width: 120px;
-            height: 120px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            pointer-events: all;
+            cursor: grab;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px currentColor;
+            border: 2px solid currentColor;
+            opacity: 0.8;
+        }
+        
+        .glowing-dot:active {
+            cursor: grabbing;
+            transform: scale(1.2);
+        }
+        
+        .dot-green {
+            background: radial-gradient(circle, rgba(0,255,127,0.6) 0%, rgba(0,255,127,0.2) 70%, transparent 100%);
+            color: rgba(0,255,127,1);
+            top: 40%;
+            right: 15%;
+            animation: pulseGreen 2s ease-in-out infinite;
+        }
+        
+        .dot-pink {
+            background: radial-gradient(circle, rgba(255,20,147,0.6) 0%, rgba(255,20,147,0.2) 70%, transparent 100%);
+            color: rgba(255,20,147,1);
+            bottom: 20%;
+            left: 40%;
+            animation: pulsePink 2s ease-in-out infinite;
+        }
+        
+        .dot-white {
+            background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 70%, transparent 100%);
+            color: rgba(255,255,255,1);
+            top: 40%;
+            left: 15%;
+            animation: pulseWhite 2s ease-in-out infinite;
+        }
+        
+        .dot-blue {
+            background: radial-gradient(circle, rgba(173,216,230,0.6) 0%, rgba(173,216,230,0.2) 70%, transparent 100%);
+            color: rgba(173,216,230,1);
+            top: 15%;
+            left: 45%;
+            animation: pulseBlue 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseGreen {
+            0%, 100% { box-shadow: 0 0 20px rgba(0,255,127,0.8); }
+            50% { box-shadow: 0 0 30px rgba(0,255,127,1), 0 0 40px rgba(0,255,127,0.6); }
+        }
+        
+        @keyframes pulsePink {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,20,147,0.8); }
+            50% { box-shadow: 0 0 30px rgba(255,20,147,1), 0 0 40px rgba(255,20,147,0.6); }
+        }
+        
+        @keyframes pulseWhite {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,255,255,0.8); }
+            50% { box-shadow: 0 0 30px rgba(255,255,255,1), 0 0 40px rgba(255,255,255,0.6); }
+        }
+        
+        @keyframes pulseBlue {
+            0%, 100% { box-shadow: 0 0 20px rgba(173,216,230,0.8); }
+            50% { box-shadow: 0 0 30px rgba(173,216,230,1), 0 0 40px rgba(173,216,230,0.6); }
+        }
+        
+        /* Center target area */
+        .center-target {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(255,255,255,0.3);
             border-radius: 50%;
             pointer-events: none;
-            display: none;
-            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
         }
         
-        .pulse-east {
-            border: 4px solid rgba(0,255,127,0.9);
-            background: radial-gradient(circle, rgba(0,255,127,0.4) 0%, rgba(0,255,127,0.1) 60%, transparent 100%);
-            box-shadow: 0 0 40px rgba(0,255,127,0.8), inset 0 0 25px rgba(0,255,127,0.3);
-            animation: swirlingGreen 4s ease-out;
-        }
-        
-        .pulse-south {
-            border: 4px solid rgba(255,20,147,0.9);
-            background: radial-gradient(circle, rgba(255,20,147,0.4) 0%, rgba(255,20,147,0.1) 60%, transparent 100%);
-            box-shadow: 0 0 40px rgba(255,20,147,0.8), inset 0 0 25px rgba(255,20,147,0.3);
-            animation: swirlingPink 4s ease-out;
-        }
-        
-        .pulse-west {
-            border: 4px solid rgba(255,255,255,0.9);
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 60%, transparent 100%);
-            box-shadow: 0 0 40px rgba(255,255,255,0.8), inset 0 0 25px rgba(255,255,255,0.3);
-            animation: swirlingWhite 4s ease-out;
-        }
-        
-        .pulse-north {
-            border: 4px solid rgba(173,216,230,0.9);
-            background: radial-gradient(circle, rgba(173,216,230,0.4) 0%, rgba(173,216,230,0.1) 60%, transparent 100%);
-            box-shadow: 0 0 40px rgba(173,216,230,0.8), inset 0 0 25px rgba(173,216,230,0.3);
-            animation: swirlingBlue 4s ease-out;
-        }
-        
-        @keyframes swirlingGreen {
-            0% { 
-                transform: translate(-50%, -50%) scale(0) rotate(0deg); 
-                opacity: 1; 
-            }
-            30% { 
-                transform: translate(-50%, -50%) scale(0.8) rotate(180deg); 
-                opacity: 0.9; 
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(3) rotate(720deg); 
-                opacity: 0; 
-            }
-        }
-        
-        @keyframes swirlingPink {
-            0% { 
-                transform: translate(-50%, -50%) scale(0) rotate(0deg); 
-                opacity: 1; 
-            }
-            30% { 
-                transform: translate(-50%, -50%) scale(0.8) rotate(-180deg); 
-                opacity: 0.9; 
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(3) rotate(-720deg); 
-                opacity: 0; 
-            }
-        }
-        
-        @keyframes swirlingWhite {
-            0% { 
-                transform: translate(-50%, -50%) scale(0) rotate(0deg); 
-                opacity: 1; 
-            }
-            30% { 
-                transform: translate(-50%, -50%) scale(0.8) rotate(180deg); 
-                opacity: 0.9; 
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(3) rotate(720deg); 
-                opacity: 0; 
-            }
-        }
-        
-        @keyframes swirlingBlue {
-            0% { 
-                transform: translate(-50%, -50%) scale(0) rotate(0deg); 
-                opacity: 1; 
-            }
-            30% { 
-                transform: translate(-50%, -50%) scale(0.8) rotate(-180deg); 
-                opacity: 0.9; 
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(3) rotate(-720deg); 
-                opacity: 0; 
-            }
-        }
-        
-        .ritual-complete {
+        .ground-complete {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
-            color: rgba(255,255,255,0.9);
-            padding: 15px 25px;
-            border-radius: 20px;
-            font-size: 12px;
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-size: 10px;
             display: none;
             text-align: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(3px);
             font-weight: 300;
         }
     </style>
 </head>
 <body>
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
-        <!-- Container for resurrection memories with wide spacing -->
-        <a-entity id="memorial-container"></a-entity>
+        <!-- Container for ground-aware memories -->
+        <a-entity id="ground-container"></a-entity>
         
         <a-entity camera look-controls="enabled: true; pointerLockEnabled: false" wasd-controls="enabled: false"></a-entity>
     </a-scene>
 
     <div class="overlay">
-        <div class="movement-instructions" id="instructions">
-            Move your body and touch to resurrect memories
+        <div class="ground-instructions" id="instructions">
+            Drag glowing dots to center
         </div>
         
-        <div class="body-guide" id="bodyGuide">
-            Walk to each direction then gesture
+        <div class="awareness-counter" id="progress">
+            <span id="count">0</span>/4
         </div>
         
-        <div class="movement-counter" id="progress">
-            Embodied rituals: <span id="count">0</span>/4
-        </div>
+        <!-- Pre-positioned glowing dots -->
+        <div class="glowing-dot dot-green" id="dotGreen"></div>
+        <div class="glowing-dot dot-pink" id="dotPink"></div>
+        <div class="glowing-dot dot-white" id="dotWhite"></div>
+        <div class="glowing-dot dot-blue" id="dotBlue"></div>
         
-        <!-- Movement zones that encourage body positioning -->
-        <div class="movement-zone zone-east" id="zoneEast">
-            Move right<br>then touch
-        </div>
+        <!-- Center target -->
+        <div class="center-target" id="centerTarget"></div>
         
-        <div class="movement-zone zone-west" id="zoneWest">
-            Move left<br>then touch
-        </div>
-        
-        <div class="movement-zone zone-north" id="zoneNorth">
-            Step forward then touch
-        </div>
-        
-        <div class="movement-zone zone-south" id="zoneSouth">
-            Step closer then touch
-        </div>
-        
-        <!-- Swirling resurrection pulses -->
-        <div class="resurrection-pulse pulse-east" id="pulseEast"></div>
-        <div class="resurrection-pulse pulse-south" id="pulseSouth"></div>
-        <div class="resurrection-pulse pulse-west" id="pulseWest"></div>
-        <div class="resurrection-pulse pulse-north" id="pulseNorth"></div>
-        
-        <div class="ritual-complete" id="ritualComplete">
-            Memorial circle embodied<br>
-            <small>Walk around to explore • Shake to begin anew</small>
+        <div class="ground-complete" id="groundComplete">
+            Ground awareness complete<br>
+            <small>Walk around fallen memories</small>
         </div>
     </div>
 
     <script>
-        // Embodied resurrection configuration
-        const embodiedSequence = [
+        // Ground awareness configuration
+        const groundMemories = [
             {
-                id: 'east-memory',
+                id: 'east-ground',
                 src: 'east-piece.glb',
-                name: 'Eastern Memory',
-                pulseId: 'pulseEast',
-                direction: 'east'
+                dotId: 'dotGreen',
+                scale: 0.9,
+                position: { x: 2.0, y: -0.5, z: -2.0 }
             },
             {
-                id: 'south-memory',
+                id: 'south-ground',
                 src: 'south-piece.glb',
-                name: 'Southern Memory',
-                pulseId: 'pulseSouth',
-                direction: 'south'
+                dotId: 'dotPink',
+                scale: 0.6,  // Reduced scale for south piece
+                position: { x: 0.0, y: -0.5, z: -1.0 }
             },
             {
-                id: 'west-memory',
+                id: 'west-ground',
                 src: 'west-piece.glb',
-                name: 'Western Memory',
-                pulseId: 'pulseWest',
-                direction: 'west'
+                dotId: 'dotWhite',
+                scale: 0.9,
+                position: { x: -2.0, y: -0.5, z: -2.0 }
             },
             {
-                id: 'north-memory',
+                id: 'north-ground',
                 src: 'north-piece.glb',
-                name: 'Northern Memory',
-                pulseId: 'pulseNorth',
-                direction: 'north'
+                dotId: 'dotBlue',
+                scale: 0.9,
+                position: { x: 0.0, y: -0.5, z: -3.0 }
             }
         ];
 
-        let currentRitualIndex = 0;
-        let embodiedCount = 0;
-        const embodiedMemories = new Set();
+        let groundCount = 0;
+        const awakenedMemories = new Set();
+        let draggedDots = new Set();
         
-        // Wide spaced positions for 360° exploration
-        const memorialPositions = [
-            { x: 2.5, y: -0.5, z: -2.5 },   // East - far right
-            { x: 0.0, y: -0.5, z: -0.8 },   // South - close front
-            { x: -2.5, y: -0.5, z: -2.5 },  // West - far left
-            { x: 0.0, y: -0.5, z: -4.0 }    // North - far back
-        ];
-
-        // Embodied gesture handlers
-        document.getElementById('zoneEast').addEventListener('click', () => performEmbodiedRitual('east'));
-        document.getElementById('zoneWest').addEventListener('click', () => performEmbodiedRitual('west'));
-        document.getElementById('zoneNorth').addEventListener('click', () => performEmbodiedRitual('north'));
-        document.getElementById('zoneSouth').addEventListener('click', () => performEmbodiedRitual('south'));
-
-        function performEmbodiedRitual(direction) {
-            if (currentRitualIndex >= embodiedSequence.length) return;
-            
-            const currentRitual = embodiedSequence[currentRitualIndex];
-            
-            // Find position for this direction
-            const positionIndex = embodiedSequence.findIndex(ritual => ritual.direction === direction);
-            if (positionIndex === -1) return;
-            
-            const memorialPosition = memorialPositions[positionIndex];
-            
-            // Show swirling resurrection pulse
-            showSwirlingPulse(currentRitual.pulseId, direction);
-            
-            // Begin embodied resurrection
-            resurrectWithMovement(currentRitual, memorialPosition);
-            
-            currentRitualIndex++;
-            embodiedCount++;
-            updateEmbodiedProgress();
+        // Get center target position
+        function getCenterPosition() {
+            const target = document.getElementById('centerTarget');
+            const rect = target.getBoundingClientRect();
+            return {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+            };
         }
-
-        function showSwirlingPulse(pulseId, direction) {
-            const pulse = document.getElementById(pulseId);
-            
-            // Position pulse based on movement zone
-            const positions = {
-                'east': { x: '85%', y: '50%' },
-                'west': { x: '15%', y: '50%' },
-                'north': { x: '50%', y: '20%' },
-                'south': { x: '50%', y: '80%' }
+        
+        // Check if dot is in center
+        function isInCenter(dotElement) {
+            const dotRect = dotElement.getBoundingClientRect();
+            const dotCenter = {
+                x: dotRect.left + dotRect.width / 2,
+                y: dotRect.top + dotRect.height / 2
             };
             
-            const pos = positions[direction];
-            pulse.style.left = pos.x;
-            pulse.style.top = pos.y;
-            pulse.style.display = 'block';
-            pulse.style.animation = 'none';
+            const centerPos = getCenterPosition();
+            const distance = Math.sqrt(
+                Math.pow(dotCenter.x - centerPos.x, 2) + 
+                Math.pow(dotCenter.y - centerPos.y, 2)
+            );
             
-            // Restart swirling animation
-            pulse.offsetHeight;
-            const animationName = pulse.className.includes('pulse-east') ? 'swirlingGreen 4s ease-out' :
-                                pulse.className.includes('pulse-south') ? 'swirlingPink 4s ease-out' :
-                                pulse.className.includes('pulse-west') ? 'swirlingWhite 4s ease-out' :
-                                'swirlingBlue 4s ease-out';
-            pulse.style.animation = animationName;
-            
-            setTimeout(() => {
-                pulse.style.display = 'none';
-            }, 4000);
+            return distance < 50; // Within 50px of center
         }
 
-        function resurrectWithMovement(ritualConfig, position) {
-            const container = document.getElementById('memorial-container');
+        // Drag functionality for each dot
+        function makeDraggable(dotElement, memoryConfig) {
+            let isDragging = false;
+            let startPos = { x: 0, y: 0 };
+            let currentPos = { x: 0, y: 0 };
             
-            // Create memory sculpture element
+            // Mouse events
+            dotElement.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Touch events
+            dotElement.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
+            
+            function startDrag(e) {
+                if (draggedDots.has(dotElement.id)) return;
+                
+                isDragging = true;
+                dotElement.style.zIndex = '1000';
+                
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                const rect = dotElement.getBoundingClientRect();
+                startPos.x = clientX - rect.left;
+                startPos.y = clientY - rect.top;
+                
+                e.preventDefault();
+            }
+            
+            function drag(e) {
+                if (!isDragging) return;
+                
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                
+                currentPos.x = clientX - startPos.x;
+                currentPos.y = clientY - startPos.y;
+                
+                dotElement.style.left = currentPos.x + 'px';
+                dotElement.style.top = currentPos.y + 'px';
+                dotElement.style.position = 'fixed';
+                
+                e.preventDefault();
+            }
+            
+            function endDrag(e) {
+                if (!isDragging) return;
+                
+                isDragging = false;
+                dotElement.style.zIndex = '999';
+                
+                // Check if dot reached center
+                if (isInCenter(dotElement)) {
+                    draggedDots.add(dotElement.id);
+                    awakenGroundMemory(memoryConfig);
+                    hideDot(dotElement);
+                }
+                
+                e.preventDefault();
+            }
+        }
+        
+        function hideDot(dotElement) {
+            dotElement.style.opacity = '0';
+            dotElement.style.pointerEvents = 'none';
+            setTimeout(() => {
+                dotElement.style.display = 'none';
+            }, 300);
+        }
+
+        function awakenGroundMemory(memoryConfig) {
+            const container = document.getElementById('ground-container');
+            
+            // Create ground memory element
             const memory = document.createElement('a-gltf-model');
-            memory.setAttribute('id', ritualConfig.id);
-            memory.setAttribute('src', ritualConfig.src);
-            memory.setAttribute('position', `${position.x} ${position.y - 0.6} ${position.z}`);
+            memory.setAttribute('id', memoryConfig.id);
+            memory.setAttribute('src', memoryConfig.src);
+            memory.setAttribute('position', 
+                `${memoryConfig.position.x} ${memoryConfig.position.y - 0.8} ${memoryConfig.position.z}`
+            );
             memory.setAttribute('scale', '0 0 0');
             memory.setAttribute('visible', false);
             
-            // Faster emergence with swirling resurrection
+            // Ground emergence animation
             memory.setAttribute('animation__emerge', 
                 'property: position; ' +
-                `from: ${position.x} ${position.y - 1.0} ${position.z}; ` +
-                `to: ${position.x} ${position.y + 0.1} ${position.z}; ` +
-                'dur: 25000; easing: easeOutQuart; startEvents: emerge'
+                `from: ${memoryConfig.position.x} ${memoryConfig.position.y - 1.2} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                'dur: 20000; easing: easeOutQuart; startEvents: emerge'
             );
             
-            // Swirling growth animation
-            memory.setAttribute('animation__swirl-resurrect', 
-                'property: scale; from: 0 0 0; to: 0.9 0.9 0.9; ' +
-                'dur: 30000; easing: easeOutElastic; startEvents: resurrect'
+            // Growing motion
+            memory.setAttribute('animation__grow', 
+                `property: scale; from: 0 0 0; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
+                'dur: 25000; easing: easeOutElastic; startEvents: grow'
             );
             
-            memory.setAttribute('animation__swirl-emerge', 
-                'property: rotation; from: 0 0 0; to: 0 720 0; ' +
-                'dur: 25000; easing: easeOutQuart; startEvents: swirl'
+            // Gentle life breathing
+            memory.setAttribute('animation__breathe', 
+                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.18} ${memoryConfig.position.z}; ` +
+                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: breathe'
             );
             
-            // Living breathing motions for 360° exploration
-            memory.setAttribute('animation__life-breathe', 
-                `property: position; from: ${position.x} ${position.y + 0.1} ${position.z}; ` +
-                `to: ${position.x} ${position.y + 0.25} ${position.z}; ` +
-                'dir: alternate; dur: 15000; easing: easeInOutSine; loop: true; startEvents: breathe'
-            );
-            
-            // Continuous gentle rotation for 360° viewing
-            memory.setAttribute('animation__life-turn', 
-                'property: rotation; from: 0 720 0; to: 0 1080 0; ' +
-                'dur: 120000; easing: linear; loop: true; startEvents: turn'
-            );
-            
-            // Scale breathing for life essence
-            memory.setAttribute('animation__life-essence', 
-                'property: scale; from: 0.9 0.9 0.9; to: 0.94 0.94 0.94; ' +
-                'dir: alternate; dur: 18000; easing: easeInOutSine; loop: true; startEvents: essence'
+            // Slow turning for 360° view
+            memory.setAttribute('animation__turn', 
+                'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                'dur: 180000; easing: linear; loop: true; startEvents: turn'
             );
             
             container.appendChild(memory);
             
-            // Load and show with embodied timing
+            // Load and show with ground timing
             memory.addEventListener('model-loaded', function() {
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('emerge');
-                    memory.emit('swirl');
-                }, 800);
+                }, 500);
                 
                 setTimeout(() => {
-                    memory.emit('resurrect');
-                }, 1500);
+                    memory.emit('grow');
+                }, 1000);
                 
                 setTimeout(() => {
                     memory.emit('breathe');
                     memory.emit('turn');
-                    memory.emit('essence');
-                }, 20000); // Start life motions after swirling resurrection
+                }, 15000);
             });
             
-            memory.addEventListener('model-error', function() {
-                console.log(`Failed to resurrect ${ritualConfig.name}`);
-            });
-            
-            embodiedMemories.add(ritualConfig.id);
+            awakenedMemories.add(memoryConfig.id);
+            groundCount++;
+            updateGroundProgress();
         }
 
-        function updateEmbodiedProgress() {
-            document.getElementById('count').textContent = embodiedCount;
+        function updateGroundProgress() {
+            document.getElementById('count').textContent = groundCount;
             
-            if (embodiedCount >= 4) {
-                // Embodied ritual complete
+            if (groundCount >= 4) {
+                // Ground awareness complete
                 setTimeout(() => {
                     document.getElementById('instructions').style.display = 'none';
-                    document.getElementById('bodyGuide').style.display = 'none';
-                    document.querySelectorAll('.movement-zone').forEach(zone => {
-                        zone.style.display = 'none';
-                    });
-                    document.getElementById('ritualComplete').style.display = 'block';
-                }, 3000);
-            } else {
-                updateEmbodiedInstructions();
+                    document.getElementById('centerTarget').style.display = 'none';
+                    document.getElementById('groundComplete').style.display = 'block';
+                }, 2000);
             }
         }
 
-        function updateEmbodiedInstructions() {
-            const instructions = document.getElementById('instructions');
-            const bodyGuide = document.getElementById('bodyGuide');
-            const messages = [
-                "Move your body and touch to resurrect memories",
-                "Continue the embodied ritual",
-                "Two more movements await",
-                "Final embodied gesture"
-            ];
-            
-            const guides = [
-                "Walk to each direction then gesture",
-                "Body movement awakens memories",
-                "Physical presence needed for revival",
-                "Complete the ritual circle"
-            ];
-            
-            if (embodiedCount < messages.length) {
-                instructions.innerHTML = messages[embodiedCount];
-                bodyGuide.innerHTML = guides[embodiedCount];
-            }
-        }
+        // Initialize draggable dots
+        groundMemories.forEach(memory => {
+            const dot = document.getElementById(memory.dotId);
+            makeDraggable(dot, memory);
+        });
 
-        // Enhanced zoom for 360° exploration
+        // Zoom for detailed ground observation
         let lastTouchDistance = 0;
         let isZooming = false;
 
@@ -534,7 +433,7 @@
                 );
                 
                 const scale = currentDistance / lastTouchDistance;
-                exploreMemories(scale);
+                observeGround(scale);
                 lastTouchDistance = currentDistance;
                 e.preventDefault();
             }
@@ -546,40 +445,44 @@
             }
         });
 
-        function exploreMemories(scaleFactor) {
-            embodiedMemories.forEach(memoryId => {
+        function observeGround(scaleFactor) {
+            awakenedMemories.forEach(memoryId => {
                 const memory = document.getElementById(memoryId);
                 if (memory && memory.getAttribute('visible')) {
                     const currentScale = memory.getAttribute('scale');
                     const newScale = {
-                        x: Math.max(0.4, Math.min(1.5, currentScale.x * scaleFactor)),
-                        y: Math.max(0.4, Math.min(1.5, currentScale.y * scaleFactor)),
-                        z: Math.max(0.4, Math.min(1.5, currentScale.z * scaleFactor))
+                        x: Math.max(0.3, Math.min(1.2, currentScale.x * scaleFactor)),
+                        y: Math.max(0.3, Math.min(1.2, currentScale.y * scaleFactor)),
+                        z: Math.max(0.3, Math.min(1.2, currentScale.z * scaleFactor))
                     };
                     memory.setAttribute('scale', newScale);
                 }
             });
         }
 
-        // Reset embodied ritual space
-        function resetEmbodiedRitual() {
-            const container = document.getElementById('memorial-container');
+        // Reset ground awareness
+        function resetGroundAwareness() {
+            const container = document.getElementById('ground-container');
             container.innerHTML = '';
             
-            currentRitualIndex = 0;
-            embodiedCount = 0;
-            embodiedMemories.clear();
+            groundCount = 0;
+            awakenedMemories.clear();
+            draggedDots.clear();
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('bodyGuide').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Move your body and touch to resurrect memories';
-            document.getElementById('bodyGuide').innerHTML = 'Walk to each direction then gesture';
-            document.getElementById('ritualComplete').style.display = 'none';
+            document.getElementById('instructions').innerHTML = 'Drag glowing dots to center';
+            document.getElementById('centerTarget').style.display = 'block';
+            document.getElementById('groundComplete').style.display = 'none';
             
-            // Show movement zones again
-            document.querySelectorAll('.movement-zone').forEach(zone => {
-                zone.style.display = 'flex';
+            // Reset all dots
+            groundMemories.forEach(memory => {
+                const dot = document.getElementById(memory.dotId);
+                dot.style.display = 'block';
+                dot.style.opacity = '0.8';
+                dot.style.pointerEvents = 'all';
+                dot.style.position = 'absolute';
+                dot.style.zIndex = '999';
             });
         }
 
@@ -592,7 +495,7 @@
                  Math.abs(event.acceleration.z) > 12)) {
                 
                 clearTimeout(shakeTimeout);
-                shakeTimeout = setTimeout(resetEmbodiedRitual, 1000);
+                shakeTimeout = setTimeout(resetGroundAwareness, 1000);
             }
         });
 
