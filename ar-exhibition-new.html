@@ -326,31 +326,38 @@
         function awakenGroundMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create ground memory element starting at center
+            // Create ground memory element starting exactly at center circle
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', '0 -0.8 -1.5'); // Start at center underground
+            // Start exactly at center circle position (0, 0, -1.5 is center in 3D space)
+            memory.setAttribute('position', '0 -1.0 -1.5'); // Start underground at center
             memory.setAttribute('scale', '0 0 0');
             memory.setAttribute('visible', false);
             
-            // Center emergence animation - emerge from center first
+            // FASTER Center emergence animation - 2x faster (7.5s instead of 15s)
             memory.setAttribute('animation__center-emerge', 
-                'property: position; from: 0 -1.2 -1.5; to: 0 0.1 -1.5; ' +
-                'dur: 15000; easing: easeOutQuart; startEvents: centerEmerge'
+                'property: position; from: 0 -1.0 -1.5; to: 0 0.2 -1.5; ' +
+                'dur: 7500; easing: easeOutQuart; startEvents: centerEmerge'
             );
             
-            // Growing motion while at center
+            // FASTER Growing motion while at center - 2x faster (9s instead of 18s)
             memory.setAttribute('animation__center-grow', 
                 `property: scale; from: 0 0 0; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 18000; easing: easeOutElastic; startEvents: centerGrow'
+                'dur: 9000; easing: easeOutElastic; startEvents: centerGrow'
             );
             
-            // Movement to final position after emerging at center
+            // ENHANCED Swirling rotation at center for full 360° viewing (3 full rotations)
+            memory.setAttribute('animation__center-swirl', 
+                'property: rotation; from: 0 0 0; to: 0 1080 0; ' +
+                'dur: 8000; easing: easeInOutSine; startEvents: centerSwirl'
+            );
+            
+            // FASTER Movement to final position - 2x faster (6s instead of 12s)
             memory.setAttribute('animation__move-to-position', 
                 'property: position; ' +
-                `from: 0 0.1 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
-                'dur: 12000; easing: easeInOutQuart; startEvents: moveToPosition'
+                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                'dur: 6000; easing: easeInOutQuart; startEvents: moveToPosition'
             );
             
             // Gentle life breathing at final position
@@ -360,37 +367,49 @@
                 'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: finalBreathe'
             );
             
-            // Slow turning for 360° view at final position
-            memory.setAttribute('animation__final-turn', 
+            // ENHANCED Continuous swirling at final position for thorough 360° viewing
+            memory.setAttribute('animation__final-swirl', 
                 'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                'dur: 180000; easing: linear; loop: true; startEvents: finalTurn'
+                'dur: 45000; easing: linear; loop: true; startEvents: finalSwirl'
+            );
+            
+            // Additional oscillating tilt for better viewing angles
+            memory.setAttribute('animation__final-tilt', 
+                'property: rotation; from: 0 0 -5; to: 0 0 5; ' +
+                'dir: alternate; dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalTilt'
             );
             
             container.appendChild(memory);
             
-            // Load and show with center-first timing sequence
+            // Load and show with FASTER center-first timing sequence
             memory.addEventListener('model-loaded', function() {
                 // 1. Start at center underground
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('centerEmerge');
-                }, 500);
+                }, 300);
                 
                 // 2. Grow while emerging at center
                 setTimeout(() => {
                     memory.emit('centerGrow');
+                }, 500);
+                
+                // 3. Start swirling at center for full 360° viewing
+                setTimeout(() => {
+                    memory.emit('centerSwirl');
                 }, 1000);
                 
-                // 3. Move to final position after center emergence
+                // 4. Move to final position after center display (faster timing)
                 setTimeout(() => {
                     memory.emit('moveToPosition');
-                }, 16000); // After center emergence completes
+                }, 8500); // After center emergence and swirling completes
                 
-                // 4. Start life motions at final position
+                // 5. Start life motions at final position
                 setTimeout(() => {
                     memory.emit('finalBreathe');
-                    memory.emit('finalTurn');
-                }, 28000); // After movement completes
+                    memory.emit('finalSwirl');
+                    memory.emit('finalTilt');
+                }, 14500); // After movement completes
             });
             
             awakenedMemories.add(memoryConfig.id);
