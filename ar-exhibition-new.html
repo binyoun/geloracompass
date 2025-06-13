@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Awakening Small Things</title>
+    <title>Gelora - Sequential Awakening</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -169,18 +169,18 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Drag green dot upward to center target
+            Drag glowing green dot to center target
         </div>
         
         <div class="awareness-counter" id="progress">
             <span id="count">0</span>/4
         </div>
         
-        <!-- FIXED: Dots with forced visibility - only first one shown initially -->
-        <div class="glowing-dot dot-green" id="dotGreen" style="display: block !important; opacity: 1 !important; visibility: visible !important;"></div>
-        <div class="glowing-dot dot-pink" id="dotPink" style="display: none !important;"></div>
-        <div class="glowing-dot dot-white" id="dotWhite" style="display: none !important;"></div>
-        <div class="glowing-dot dot-blue" id="dotBlue" style="display: none !important;"></div>
+        <!-- All 4 dots visible from start - positioned in cardinal directions -->
+        <div class="glowing-dot dot-green active" id="dotGreen"></div>
+        <div class="glowing-dot dot-pink inactive" id="dotPink"></div>
+        <div class="glowing-dot dot-white inactive" id="dotWhite"></div>
+        <div class="glowing-dot dot-blue inactive" id="dotBlue"></div>
         
         <!-- Drag trail line -->
         <div class="drag-line" id="dragLine"></div>
@@ -267,39 +267,27 @@
             return distance < 40; // Within 40px of center target
         }
 
-        // FIXED: Force show current dot with maximum visibility
-        function showCurrentDot() {
-            console.log('Showing dot for index:', currentAvailableDot); // Debug
+        // FIXED: Show all dots but activate sequentially
+        function updateDotStates() {
+            console.log('Updating dot states, current index:', currentAvailableDot);
             
-            // Force hide all dots
-            groundMemories.forEach(memory => {
+            groundMemories.forEach((memory, index) => {
                 const dot = document.getElementById(memory.dotId);
-                dot.style.display = 'none !important';
-                dot.style.opacity = '0';
-                dot.style.visibility = 'hidden';
+                
+                if (index === currentAvailableDot) {
+                    // Current active dot
+                    dot.className = dot.className.replace('inactive', 'active');
+                    dot.style.pointerEvents = 'all !important';
+                    console.log('Activated dot:', memory.dotId);
+                } else if (index < currentAvailableDot) {
+                    // Already completed dots - hide them
+                    dot.style.display = 'none !important';
+                } else {
+                    // Future dots - show but inactive
+                    dot.className = dot.className.replace('active', 'inactive');
+                    dot.style.pointerEvents = 'none !important';
+                }
             });
-            
-            // Force show only current available dot
-            if (currentAvailableDot < groundMemories.length) {
-                const currentMemory = groundMemories[currentAvailableDot];
-                const currentDot = document.getElementById(currentMemory.dotId);
-                
-                // Force maximum visibility
-                currentDot.style.display = 'block !important';
-                currentDot.style.opacity = '1 !important';
-                currentDot.style.visibility = 'visible !important';
-                currentDot.style.pointerEvents = 'all !important';
-                currentDot.style.zIndex = '9999 !important';
-                
-                // Force position at bottom center
-                currentDot.style.position = 'fixed !important';
-                currentDot.style.left = '50% !important';
-                currentDot.style.bottom = '8% !important';
-                currentDot.style.top = 'auto !important';
-                currentDot.style.transform = 'translateX(-50%) !important';
-                
-                console.log('Current dot should be visible:', currentDot.id); // Debug
-            }
         }
 
         // Create drag trail line
@@ -405,7 +393,7 @@
                     awakenGroundMemory(memoryConfig);
                     hideDot(dotElement);
                     currentAvailableDot++; // Move to next dot
-                    setTimeout(() => showCurrentDot(), 500); // Show next dot after brief delay
+                    setTimeout(() => updateDotStates(), 500); // Update dot states
                 } else {
                     console.log('Dot not in center, resetting position');
                     // Reset position if not successful
@@ -554,7 +542,13 @@
                 // Update instruction for current piece
                 const currentMemory = groundMemories[currentAvailableDot];
                 if (currentMemory) {
-                    document.getElementById('instructions').innerHTML = `Drag ${currentMemory.color} dot upward`;
+                    const instructions = {
+                        'green': 'Drag glowing green dot to center target',
+                        'pink': 'Drag glowing pink dot to center target', 
+                        'white': 'Drag glowing white dot to center target',
+                        'blue': 'Drag glowing blue dot to center target'
+                    };
+                    document.getElementById('instructions').innerHTML = instructions[currentMemory.color];
                 }
             }
         }': 'pink', 
@@ -567,8 +561,8 @@
             }
         }
 
-        // Initialize - show only first dot
-        showCurrentDot();
+        // Initialize dot states - show all dots, activate first one
+        updateDotStates();
         
         // Initialize draggable dots
         groundMemories.forEach(memory => {
