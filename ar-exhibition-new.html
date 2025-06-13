@@ -209,8 +209,8 @@
                 element: 'fire',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.48, // Resized: 0.6 * 0.8 = 0.48
-                position: { x: -1.8, y: -0.6, z: -0.5 }, // Moved further from metal (was -1.2)
+                scale: 0.6,
+                position: { x: -1.2, y: -0.6, z: -0.5 },
                 motionType: 'energetic-burst'
             },
             {
@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.8, y: -0.7, z: -2.5 }, // Moved further from fire (was -2.2)
+                position: { x: -2.2, y: -0.7, z: -2.5 },
                 motionType: 'crystalline-precise'
             },
             {
@@ -264,7 +264,7 @@
             return distance < 50;
         }
 
-        // Apply elemental-specific animations based on element type
+        // Apply elemental-specific animations and breathing patterns
         function applyElementalMotion(memory, elementType, scale) {
             switch(elementType) {
                 case 'wood':
@@ -291,10 +291,10 @@
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // WOOD BREATHING: Deep, slow like ancient tree
-                    memory.setAttribute('animation__wood-breathing', 
-                        `property: scale; from: ${scale * 0.98} ${scale * 0.98} ${scale * 0.98}; to: ${scale * 1.03} ${scale * 1.03} ${scale * 1.03}; ` +
-                        'dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    // WOOD BREATHING: Deep, slow expansion like tree growth cycles
+                    memory.setAttribute('animation__wood-breathe', 
+                        `property: scale; from: ${scale * 0.94} ${scale * 0.94} ${scale * 0.94}; to: ${scale * 1.06} ${scale * 1.06} ${scale * 1.06}; ` +
+                        'dir: alternate; dur: 6000; easing: easeInOutQuart; loop: true; startEvents: startBreathing'
                     );
                     break;
 
@@ -321,10 +321,22 @@
                         'dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // FIRE BREATHING: Quick, erratic like flickering flame
-                    memory.setAttribute('animation__fire-breathing', 
-                        `property: scale; from: ${scale * 0.92} ${scale * 0.92} ${scale * 0.92}; to: ${scale * 1.08} ${scale * 1.08} ${scale * 1.08}; ` +
-                        'dir: alternate; dur: 1200; easing: easeInOutQuad; loop: true; startEvents: finalMotion'
+                    // Fire heartbeat-like pulsing
+                    memory.setAttribute('animation__fire-heartbeat', 
+                        `property: scale; from: ${scale * 0.95} ${scale * 0.95} ${scale * 0.95}; to: ${scale * 1.05} ${scale * 1.05} ${scale * 1.05}; ` +
+                        'dir: alternate; dur: 1800; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // FIRE BREATHING: Quick, intense bursts like flames flickering
+                    memory.setAttribute('animation__fire-breathe', 
+                        `property: scale; from: ${scale * 0.88} ${scale * 0.88} ${scale * 0.88}; to: ${scale * 1.12} ${scale * 1.12} ${scale * 1.12}; ` +
+                        'dir: alternate; dur: 1200; easing: easeInOutBack; loop: true; startEvents: startBreathing'
+                    );
+                    
+                    // Fire breathing with slight position flicker
+                    memory.setAttribute('animation__fire-breathe-flicker', 
+                        'property: position; from: 0 -0.02 0; to: 0 0.02 0; ' +
+                        'dir: alternate; dur: 800; easing: easeInOutSine; loop: true; startEvents: startBreathing'
                     );
                     break;
 
@@ -352,10 +364,16 @@
                         'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     
-                    // METAL BREATHING: Mechanical, precise like machinery
-                    memory.setAttribute('animation__metal-breathing', 
-                        `property: scale; from: ${scale * 0.995} ${scale * 0.995} ${scale * 0.995}; to: ${scale * 1.015} ${scale * 1.015} ${scale * 1.015}; ` +
-                        'dir: alternate; dur: 3000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    // METAL BREATHING: Precise, mechanical expansion like crystalline structure
+                    memory.setAttribute('animation__metal-breathe', 
+                        `property: scale; from: ${scale * 0.96} ${scale * 0.96} ${scale * 0.96}; to: ${scale * 1.04} ${scale * 1.04} ${scale * 1.04}; ` +
+                        'dir: alternate; dur: 3000; easing: easeInOutCubic; loop: true; startEvents: startBreathing'
+                    );
+                    
+                    // Metal breathing with geometric precision - slight angular shift
+                    memory.setAttribute('animation__metal-breathe-angle', 
+                        'property: rotation; from: 0 -1 0; to: 0 1 0; ' +
+                        'dir: alternate; dur: 4500; easing: easeInOutCubic; loop: true; startEvents: startBreathing'
                     );
                     break;
 
@@ -383,10 +401,22 @@
                         'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // WATER BREATHING: Flowing, wave-like rhythm
-                    memory.setAttribute('animation__water-breathing', 
-                        `property: scale; from: ${scale * 0.97} ${scale * 0.97} ${scale * 0.97}; to: ${scale * 1.04} ${scale * 1.04} ${scale * 1.04}; ` +
-                        'dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    // WATER BREATHING: Fluid, wave-like expansion that mimics tidal breathing
+                    memory.setAttribute('animation__water-breathe', 
+                        `property: scale; from: ${scale * 0.92} ${scale} ${scale * 0.92}; to: ${scale * 1.08} ${scale} ${scale * 1.08}; ` +
+                        'dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: startBreathing'
+                    );
+                    
+                    // Water breathing with gentle vertical flow
+                    memory.setAttribute('animation__water-breathe-flow', 
+                        'property: position; from: 0 -0.03 0; to: 0 0.03 0; ' +
+                        'dir: alternate; dur: 3500; easing: easeInOutSine; loop: true; startEvents: startBreathing'
+                    );
+                    
+                    // Water breathing with subtle rotation wave
+                    memory.setAttribute('animation__water-breathe-wave', 
+                        'property: rotation; from: 0 0 -2; to: 0 0 2; ' +
+                        'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: startBreathing'
                     );
                     break;
             }
@@ -513,6 +543,11 @@
                     memory.emit('finalMotion');
                     enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
+                
+                // Start breathing motion after settling in final position
+                setTimeout(() => {
+                    memory.emit('startBreathing');
+                }, emergeDuration + 10000);
             });
             
             awakenedMemories.add(memoryConfig.id);
