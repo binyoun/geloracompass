@@ -518,53 +518,48 @@
         function enableDoubleTapRotation(memory) {
             let tapCount = 0;
             let tapTimer = null;
+            let lastTapTime = 0;
             
-            memory.addEventListener('click', handleTap);
-            memory.addEventListener('touchend', handleTap, { passive: false });
+            // Add cursor component to make it clickable
+            memory.setAttribute('cursor', 'rayOrigin: mouse');
             
-            function handleTap(e) {
-                tapCount++;
+            // Use A-Frame's click event
+            memory.addEventListener('click', handleClick);
+            
+            function handleClick(e) {
+                const currentTime = Date.now();
                 
-                if (tapCount === 1) {
-                    // Start timer for double-tap detection
-                    tapTimer = setTimeout(() => {
-                        tapCount = 0; // Reset if no second tap
-                    }, 300); // 300ms window for double-tap
-                } else if (tapCount === 2) {
+                // Check if this is a double-tap (within 400ms of previous tap)
+                if (currentTime - lastTapTime < 400) {
                     // Double-tap detected!
-                    clearTimeout(tapTimer);
-                    tapCount = 0;
-                    
                     rotateGelora90Degrees(memory);
+                    lastTapTime = 0; // Reset to prevent triple-tap
+                } else {
+                    // First tap
+                    lastTapTime = currentTime;
                 }
                 
-                e.preventDefault();
                 e.stopPropagation();
             }
             
             function rotateGelora90Degrees(memory) {
                 // Get current rotation
                 const currentRotation = memory.getAttribute('rotation');
-                const newRotationY = currentRotation.y + 90; // Rotate 90 degrees each double-tap
+                const newRotationY = currentRotation.y + 90;
                 
-                // Create smooth rotation animation
-                const rotationAnimation = document.createElement('a-animation');
-                rotationAnimation.setAttribute('attribute', 'rotation');
-                rotationAnimation.setAttribute('from', `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`);
-                rotationAnimation.setAttribute('to', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
-                rotationAnimation.setAttribute('dur', '800'); // 0.8 second smooth rotation
-                rotationAnimation.setAttribute('easing', 'easeInOutQuad');
+                // Use A-Frame animation component
+                memory.setAttribute('animation__manual-rotate', {
+                    property: 'rotation',
+                    from: `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`,
+                    to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
+                    dur: 800,
+                    easing: 'easeInOutQuad'
+                });
                 
-                // Add animation to memory and start it
-                memory.appendChild(rotationAnimation);
-                
-                // Remove animation element after completion
+                // Update rotation after animation
                 setTimeout(() => {
-                    if (rotationAnimation.parentNode) {
-                        rotationAnimation.parentNode.removeChild(rotationAnimation);
-                    }
-                    // Update the actual rotation attribute
                     memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                    memory.removeAttribute('animation__manual-rotate');
                 }, 800);
             }
         }
