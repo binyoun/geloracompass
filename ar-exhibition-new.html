@@ -209,8 +209,8 @@
                 element: 'fire',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.6,
-                position: { x: -1.2, y: -0.6, z: -0.5 },
+                scale: 0.48, // Reduced from 0.6 to 0.48 (0.6 * 0.8)
+                position: { x: -0.8, y: -0.6, z: -0.5 }, // Moved from x: -1.2 to x: -0.8 for spacing
                 motionType: 'energetic-burst'
             },
             {
@@ -570,44 +570,63 @@
             makeDraggable(dot, memory);
         });
 
-        // Zoom functionality
+        // Enhanced zoom functionality with better pinch detection
         let lastTouchDistance = 0;
         let isZooming = false;
+        let initialDistance = 0;
+        let zoomSensitivity = 0.002; // Adjust for smoother zoom
+
+        function getTouchDistance(touch1, touch2) {
+            return Math.sqrt(
+                Math.pow(touch2.clientX - touch1.clientX, 2) +
+                Math.pow(touch2.clientY - touch1.clientY, 2)
+            );
+        }
 
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length === 2) {
                 isZooming = true;
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
-                lastTouchDistance = Math.sqrt(
-                    Math.pow(touch2.clientX - touch1.clientX, 2) +
-                    Math.pow(touch2.clientY - touch1.clientY, 2)
-                );
+                initialDistance = getTouchDistance(touch1, touch2);
+                lastTouchDistance = initialDistance;
                 e.preventDefault();
             }
-        });
+        }, { passive: false });
 
         document.addEventListener('touchmove', function(e) {
             if (e.touches.length === 2 && isZooming) {
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
-                const currentDistance = Math.sqrt(
-                    Math.pow(touch2.clientX - touch1.clientX, 2) +
-                    Math.pow(touch2.clientY - touch1.clientY, 2)
-                );
+                const currentDistance = getTouchDistance(touch1, touch2);
                 
-                const scale = currentDistance / lastTouchDistance;
-                observeGround(scale);
+                // Calculate scale factor based on distance change
+                const distanceChange = currentDistance - lastTouchDistance;
+                const scaleFactor = 1 + (distanceChange * zoomSensitivity);
+                
+                // Apply zoom with bounds checking
+                observeGround(scaleFactor);
                 lastTouchDistance = currentDistance;
                 e.preventDefault();
             }
-        });
+        }, { passive: false });
 
         document.addEventListener('touchend', function(e) {
             if (e.touches.length < 2) {
                 isZooming = false;
+                initialDistance = 0;
+                lastTouchDistance = 0;
             }
         });
+
+        // Mouse wheel zoom support for desktop
+        document.addEventListener('wheel', function(e) {
+            if (awakenedMemories.size > 0) {
+                e.preventDefault();
+                const scaleFactor = e.deltaY > 0 ? 0.95 : 1.05;
+                observeGround(scaleFactor);
+            }
+        }, { passive: false });
 
         function observeGround(scaleFactor) {
             awakenedMemories.forEach(memoryId => {
@@ -615,9 +634,9 @@
                 if (memory && memory.getAttribute('visible')) {
                     const currentScale = memory.getAttribute('scale');
                     const newScale = {
-                        x: Math.max(0.3, Math.min(1.2, currentScale.x * scaleFactor)),
-                        y: Math.max(0.3, Math.min(1.2, currentScale.y * scaleFactor)),
-                        z: Math.max(0.3, Math.min(1.2, currentScale.z * scaleFactor))
+                        x: Math.max(0.2, Math.min(1.5, currentScale.x * scaleFactor)),
+                        y: Math.max(0.2, Math.min(1.5, currentScale.y * scaleFactor)),
+                        z: Math.max(0.2, Math.min(1.5, currentScale.z * scaleFactor))
                     };
                     memory.setAttribute('scale', newScale);
                 }
