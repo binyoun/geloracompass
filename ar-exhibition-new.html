@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AR Art Exhibition - Progressive Loading</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
+    <style>
+        body { margin: 0; font-family: Arial; }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            text-align: center;
+            font-size: 16px;
+            max-width: 80%;
+        }
+        .tap-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(transparent, rgba(255,255,255,0.1));
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-top: none;
+            pointer-events: all;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+        .tap-area:active {
+            background: rgba(255,255,255,0.2);
+        }
+        .progress-info {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            font-size: 16px;
+            display: none;
+            text-align: center;
+        }
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .file-size-info {
+            position: absolute;
+            bottom: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+        <!-- Models load progressively - only one at a time -->
+        
+        <!-- NORTH: Loads first (immediately) -->
+        <a-gltf-model 
+            id="north-artwork"
+            src="" 
+            scale="0 0 0" 
+            position="0 -1 -2.5"
+            animation__appear="property: scale; from: 0 0 0; to: 0.3 0.3 0.3; dur: 1500; easing: easeOutElastic"
+            animation__float="property: position; from: 0 -1 -2.5; to: 0 0.2 -2.5; dur: 2000; easing: easeOutQuad"
+            animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 8000"
+            visible="false">
+        </a-gltf-model>
+        
+        <!-- EAST: Loads when user wants to see it -->
+        <a-gltf-model 
+            id="east-artwork"
+            src="" 
+            scale="0 0 0" 
+            position="2 -1 -1.5"
+            animation__appear="property: scale; from: 0 0 0; to: 0.3 0.3 0.3; dur: 1500; easing: easeOutElastic"
+            animation__float="property: position; from: 2 -1 -1.5; to: 2 0.3 -1.5; dur: 2000; easing: easeOutQuad"
+            animation__rotate="property: rotation; to: 0 -360 0; loop: true; dur: 10000"
+            visible="false">
+        </a-gltf-model>
+        
+        <!-- SOUTH: Loads when user wants to see it -->
+        <a-gltf-model 
+            id="south-artwork"
+            src="" 
+            scale="0 0 0" 
+            position="0 -1 -0.8"
+            animation__appear="property: scale; from: 0 0 0; to: 0.25 0.25 0.25; dur: 1500; easing: easeOutElastic"
+            animation__float="property: position; from: 0 -1 -0.8; to: 0 0.1 -0.8; dur: 2000; easing: easeOutQuad"
+            animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 12000"
+            visible="false">
+        </a-gltf-model>
+        
+        <!-- WEST: Loads when user wants to see it -->
+        <a-gltf-model 
+            id="west-artwork"
+            src="" 
+            scale="0 0 0" 
+            position="-2 -1 -1.5"
+            animation__appear="property: scale; from: 0 0 0; to: 0.3 0.3 0.3; dur: 1500; easing: easeOutElastic"
+            animation__float="property: position; from: -2 -1 -1.5; to: -2 0.3 -1.5; dur: 2000; easing: easeOutQuad"
+            animation__rotate="property: rotation; to: 0 360 0; loop: true; dur: 9000"
+            visible="false">
+        </a-gltf-model>
+        
+        <a-entity camera look-controls wasd-controls="enabled: false"></a-entity>
+    </a-scene>
+
+    <div class="overlay">
+        <div class="instructions" id="instructions">
+            Point camera towards the ground. First artwork (East) is loading... 🌱
+        </div>
+        
+        <div class="progress-info" id="progress">
+            Garden: <span id="count">0</span>/4
+        </div>
+        
+        <div class="file-size-info" id="sizeInfo">
+            Loading: <span id="currentSize">--</span>
+        </div>
+        
+        <div class="loading-indicator" id="loadingIndicator">
+            <div class="loading-spinner"></div>
+            <div id="loadingText">Loading North Artwork...</div>
+        </div>
+        
+        <div class="tap-area" id="tapArea">
+            <div>Loading East piece first...</div>
+            <div style="font-size: 14px; margin-top: 5px;">Please wait</div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Loading Order: EAST → SOUTH → WEST → NORTH
+        const artworkConfig = [
+            {
+                id: 'east-artwork', 
+                src: 'east-piece.glb',
+                name: 'East Piece', 
+                direction: 'EAST ➡️',
+                estimatedSize: '9.5MB'
+            },
+            {
+                id: 'south-artwork',
+                src: 'south-piece.glb', 
+                name: 'South Piece',
+                direction: 'SOUTH ⬇️', 
+                estimatedSize: '7.7MB'
+            },
+            {
+                id: 'west-artwork',
+                src: 'west-piece.glb',
+                name: 'West Piece', 
+                direction: 'WEST ⬅️',
+                estimatedSize: '7.6MB'
+            },
+            {
+                id: 'north-artwork',
+                src: 'north-piece.glb',
+                name: 'North Piece',
+                direction: 'NORTH ⬆️',
+                estimatedSize: '9.4MB'
+            }
+        ];
+
+        let currentArtworkIndex = 0;
+        let artworksLoaded = 0;
+        let isLoading = false;
+        let loadedModels = new Set();
+
+        // Progressive loading system
+        function loadArtwork(index) {
+            if (index >= artworkConfig.length || isLoading) return;
+            
+            const config = artworkConfig[index];
+            const model = document.getElementById(config.id);
+            
+            if (loadedModels.has(config.id)) {
+                // Already loaded, just show it
+                showArtwork(config.id, config.direction);
+                return;
+            }
+
+            // Show loading indicator
+            isLoading = true;
+            showLoading(config.name, config.estimatedSize);
+            
+            // Load the model
+            model.setAttribute('src', config.src);
+            
+            // Wait for model to load
+            model.addEventListener('model-loaded', function() {
+                isLoading = false;
+                loadedModels.add(config.id);
+                hideLoading();
+                showArtwork(config.id, config.direction);
+                
+                // Update UI for next artwork
+                updateUIForNextArtwork();
+            });
+            
+            // Handle loading errors
+            model.addEventListener('model-error', function() {
+                isLoading = false;
+                hideLoading();
+                showError(config.name);
+            });
+        }
+
+        function showArtwork(artworkId, direction) {
+            const model = document.getElementById(artworkId);
+            model.setAttribute('visible', true);
+            model.emit('appear');
+            model.emit('float'); 
+            model.emit('rotate');
+            
+            artworksLoaded++;
+            document.getElementById('count').textContent = artworksLoaded;
+            
+            // Update instructions
+            document.getElementById('instructions').innerHTML = 
+                `Beautiful! ${direction} piece is blooming 🌸<br><small>Tap for next direction</small>`;
+        }
+
+        function showLoading(artworkName, size) {
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('loadingText').textContent = `Loading ${artworkName}...`;
+            document.getElementById('currentSize').textContent = size;
+            document.getElementById('tapArea').innerHTML = 
+                `<div>Loading ${artworkName}...</div><div style="font-size: 14px; margin-top: 5px;">Please wait (~${size})</div>`;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('currentSize').textContent = 'Ready';
+        }
+
+        function showError(artworkName) {
+            document.getElementById('instructions').innerHTML = 
+                `❌ Failed to load ${artworkName}<br><small>Check filename and try again</small>`;
+            document.getElementById('tapArea').innerHTML = 
+                `<div>Loading failed</div><div style="font-size: 14px; margin-top: 5px;">Tap to retry</div>`;
+        }
+
+        function updateUIForNextArtwork() {
+            currentArtworkIndex++;
+            
+            if (currentArtworkIndex >= artworkConfig.length) {
+                // All done!
+                document.getElementById('instructions').innerHTML = 
+                    `🎉 Complete Compass Garden! 🧭<br><small>Shake phone to reset</small>`;
+                document.getElementById('tapArea').innerHTML = 
+                    `<div>Garden Complete! 🌻</div><div style="font-size: 14px; margin-top: 5px;">Shake to reset</div>`;
+                return;
+            }
+            
+            const nextConfig = artworkConfig[currentArtworkIndex];
+            document.getElementById('tapArea').innerHTML = 
+                `<div>TAP TO GROW ${nextConfig.direction}</div><div style="font-size: 14px; margin-top: 5px;">Next: ${nextConfig.name}</div>`;
+        }
+
+        // Tap handler for progressive loading
+        document.getElementById('tapArea').addEventListener('click', function() {
+            if (isLoading) return; // Don't allow taps while loading
+            
+            if (currentArtworkIndex < artworkConfig.length) {
+                loadArtwork(currentArtworkIndex);
+            } else {
+                // Reset functionality
+                resetGarden();
+            }
+        });
+
+        // Reset function
+        function resetGarden() {
+            artworkConfig.forEach(function(config) {
+                const artwork = document.getElementById(config.id);
+                artwork.setAttribute('visible', false);
+                artwork.setAttribute('scale', '0 0 0');
+                artwork.setAttribute('src', ''); // Unload model
+            });
+            
+            currentArtworkIndex = 0;
+            artworksLoaded = 0;
+            loadedModels.clear();
+            
+            document.getElementById('count').textContent = '0';
+            document.getElementById('instructions').innerHTML = 
+                'Point camera towards the ground. First artwork (East) is loading... 🌱';
+            document.getElementById('tapArea').innerHTML = 
+                '<div>Loading East piece first...</div><div style="font-size: 14px; margin-top: 5px;">Please wait</div>';
+            
+            // Start loading first artwork again
+            setTimeout(() => loadArtwork(0), 1000);
+        }
+
+        // Shake to reset (same as before)
+        let shakeTimeout;
+        window.addEventListener('devicemotion', function(event) {
+            if (event.acceleration && 
+                (Math.abs(event.acceleration.x) > 15 || 
+                 Math.abs(event.acceleration.y) > 15 || 
+                 Math.abs(event.acceleration.z) > 15)) {
+                
+                clearTimeout(shakeTimeout);
+                shakeTimeout = setTimeout(resetGarden, 500);
+            }
+        });
+
+        // Start loading the first artwork when page loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                loadArtwork(0);
+            }, 2000); // Give AR.js time to initialize
+        });
+    </script>
+</body>
+</html>
