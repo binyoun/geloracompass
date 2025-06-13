@@ -176,11 +176,14 @@
             <span id="count">0</span>/4
         </div>
         
-        <!-- Pre-positioned glowing dots -->
+        <!-- Pre-positioned glowing dots - only first one visible initially -->
         <div class="glowing-dot dot-green" id="dotGreen"></div>
-        <div class="glowing-dot dot-pink" id="dotPink"></div>
-        <div class="glowing-dot dot-white" id="dotWhite"></div>
-        <div class="glowing-dot dot-blue" id="dotBlue"></div>
+        <div class="glowing-dot dot-pink" id="dotPink" style="display: none;"></div>
+        <div class="glowing-dot dot-white" id="dotWhite" style="display: none;"></div>
+        <div class="glowing-dot dot-blue" id="dotBlue" style="display: none;"></div>
+        
+        <!-- Drag trail line -->
+        <div class="drag-line" id="dragLine"></div>
         
         <!-- Center target -->
         <div class="center-target" id="centerTarget"></div>
@@ -270,7 +273,6 @@
             groundMemories.forEach(memory => {
                 const dot = document.getElementById(memory.dotId);
                 dot.style.display = 'none';
-                dot.style.opacity = '0';
             });
             
             // Show only current available dot
@@ -284,16 +286,40 @@
                 // Reset position to bottom center
                 currentDot.style.position = 'absolute';
                 currentDot.style.left = '50%';
-                currentDot.style.bottom = '15%';
+                currentDot.style.bottom = '10%';
+                currentDot.style.top = 'auto';
                 currentDot.style.transform = 'translateX(-50%)';
+                currentDot.style.zIndex = '1000';
             }
+        }
+
+        // Create drag trail line
+        function createDragLine(startX, startY, endX, endY, color) {
+            const line = document.getElementById('dragLine');
+            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+            
+            line.style.left = startX + 'px';
+            line.style.top = startY + 'px';
+            line.style.height = length + 'px';
+            line.style.transform = `rotate(${angle + 90}deg)`;
+            line.style.transformOrigin = '0 0';
+            line.style.background = `linear-gradient(to top, ${color}, transparent)`;
+            line.style.color = color;
+            line.style.opacity = '0.6';
+        }
+
+        // Hide drag line
+        function hideDragLine() {
+            const line = document.getElementById('dragLine');
+            line.style.opacity = '0';
         }
 
         // Drag functionality for each dot
         function makeDraggable(dotElement, memoryConfig) {
             let isDragging = false;
             let startPos = { x: 0, y: 0 };
-            let currentPos = { x: 0, y: 0 };
+            let startDotPos = { x: 0, y: 0 };
             
             // Mouse events
             dotElement.addEventListener('mousedown', startDrag);
@@ -309,7 +335,7 @@
                 if (memoryConfig.order !== currentAvailableDot || draggedDots.has(dotElement.id)) return;
                 
                 isDragging = true;
-                dotElement.style.zIndex = '1000';
+                dotElement.style.zIndex = '1001';
                 
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
@@ -317,6 +343,10 @@
                 const rect = dotElement.getBoundingClientRect();
                 startPos.x = clientX - rect.left;
                 startPos.y = clientY - rect.top;
+                
+                // Store initial dot position for line drawing
+                startDotPos.x = rect.left + rect.width / 2;
+                startDotPos.y = rect.top + rect.height / 2;
                 
                 e.preventDefault();
             }
@@ -327,13 +357,26 @@
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 
-                currentPos.x = clientX - startPos.x;
-                currentPos.y = clientY - startPos.y;
+                const newX = clientX - startPos.x;
+                const newY = clientY - startPos.y;
                 
-                dotElement.style.left = currentPos.x + 'px';
-                dotElement.style.top = currentPos.y + 'px';
+                dotElement.style.left = newX + 'px';
+                dotElement.style.top = newY + 'px';
                 dotElement.style.position = 'fixed';
                 dotElement.style.transform = 'none';
+                
+                // Create drag line from start position to current position
+                const currentDotX = clientX;
+                const currentDotY = clientY;
+                
+                // Get dot color for line
+                const color = dotElement.style.color || 
+                    (memoryConfig.color === 'green' ? 'rgba(0,255,127,1)' :
+                     memoryConfig.color === 'pink' ? 'rgba(255,20,147,1)' :
+                     memoryConfig.color === 'white' ? 'rgba(255,255,255,1)' :
+                     'rgba(173,216,230,1)');
+                
+                createDragLine(startDotPos.x, startDotPos.y, currentDotX, currentDotY, color);
                 
                 e.preventDefault();
             }
@@ -342,7 +385,8 @@
                 if (!isDragging) return;
                 
                 isDragging = false;
-                dotElement.style.zIndex = '999';
+                dotElement.style.zIndex = '1000';
+                hideDragLine();
                 
                 // Check if dot reached center target
                 if (isInCenter(dotElement)) {
@@ -350,12 +394,12 @@
                     awakenGroundMemory(memoryConfig);
                     hideDot(dotElement);
                     currentAvailableDot++; // Move to next dot
-                    showCurrentDot(); // Show next available dot
+                    setTimeout(() => showCurrentDot(), 500); // Show next dot after brief delay
                 } else {
                     // Reset position if not successful
                     dotElement.style.position = 'absolute';
                     dotElement.style.left = '50%';
-                    dotElement.style.bottom = '15%';
+                    dotElement.style.bottom = '10%';
                     dotElement.style.top = 'auto';
                     dotElement.style.transform = 'translateX(-50%)';
                 }
@@ -496,6 +540,9 @@
             }
         }
 
+        // Initialize - show only first dot
+        showCurrentDot();
+        
         // Initialize draggable dots
         groundMemories.forEach(memory => {
             const dot = document.getElementById(memory.dotId);
