@@ -193,35 +193,51 @@
     </div>
 
     <script>
-        // Ground awareness configuration with lowered positions for flowers/plants
+        // Ground awareness configuration with much lower positions and unique rhythms
         const groundMemories = [
             {
                 id: 'east-ground',
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.2, y: -0.8, z: -1.8 } // Much lower - ground level
+                position: { x: 2.2, y: -1.3, z: -1.8 }, // 2x lower - deep ground level
+                swirl: 15000, // Unique rhythm - slow and meditative
+                spin: 18000,
+                breathe: 2500,
+                sway: 10000
             },
             {
                 id: 'south-ground',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.6,
-                position: { x: -1.2, y: -0.6, z: -0.5 } // Lower for plant life
+                position: { x: -1.2, y: -1.1, z: -0.5 }, // Much lower
+                swirl: 9000, // Faster rhythm - energetic
+                spin: 7500,
+                breathe: 1800,
+                sway: 14000
             },
             {
                 id: 'west-ground',
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.2, y: -0.7, z: -2.5 } // Ground level
+                position: { x: -2.2, y: -1.2, z: -2.5 }, // Deep ground
+                swirl: 20000, // Very slow - ancient rhythm
+                spin: 25000,
+                breathe: 3500,
+                sway: 16000
             },
             {
                 id: 'north-ground',
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.7, z: -3.8 } // Much lower than before
+                position: { x: 1.5, y: -1.2, z: -3.8 }, // Much lower
+                swirl: 12000, // Medium rhythm - balanced
+                spin: 14000,
+                breathe: 2200,
+                sway: 11000
             }
         ];
 
@@ -422,26 +438,25 @@
             
             container.appendChild(memory);
             
-            // Perfect sequence: emerge at center, grow at center, then move to position
+            // Perfect sequence with visible growth and slower movement
             memory.addEventListener('model-loaded', function() {
-                // 1. Immediately show and emerge at center circle
+                // 1. Immediately start emergence (piece already visible)
                 setTimeout(() => {
-                    memory.setAttribute('visible', true);
                     memory.emit('emergeAtCenter');
                 }, 100);
                 
-                // 2. Start growing and swirling while at center
+                // 2. Start SLOW, visible growing and swirling at center
                 setTimeout(() => {
                     memory.emit('growAtCenter');
                     memory.emit('centerSwirl');
                 }, 500);
                 
-                // 3. Move to final position after fully grown at center - SLOWER timing
+                // 3. Move to final position after growth completes - SLOWER timing
                 setTimeout(() => {
                     memory.emit('moveToFinalPosition');
-                }, 12500);
+                }, 15500);
                 
-                // 4. Start organic life motions at final position - SLOWER timing
+                // 4. Start EXAGGERATED organic life motions at final position
                 setTimeout(() => {
                     memory.emit('finalFloat');
                     memory.emit('finalSwirl');
@@ -451,7 +466,8 @@
                     memory.emit('orbitalFloat');
                     memory.emit('organicSway');
                     memory.emit('cellularPulse');
-                }, 22500);
+                    memory.emit('dramaticTilt');
+                }, 30500);
             });
             
             awakenedMemories.add(memoryConfig.id);
