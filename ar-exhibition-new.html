@@ -193,47 +193,51 @@
     </div>
 
     <script>
-        // Ground awareness configuration with better separation and unique fine-tuned rhythms
+        // Ground awareness configuration with much lower positions and unique rhythms
         const groundMemories = [
             {
                 id: 'east-ground',
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.5, y: -1.3, z: -1.5 }, // Far right
-                // Calm, meditative rhythms - like ancient tree
-                swirl: 22000, spin: 28000, breathe: 3200, sway: 15000, 
-                pulse: 4800, tilt: 9500, orbit: 18000
+                position: { x: 2.2, y: -1.3, z: -1.8 }, // 2x lower - deep ground level
+                swirl: 15000, // Unique rhythm - slow and meditative
+                spin: 18000,
+                breathe: 2500,
+                sway: 10000
             },
             {
                 id: 'south-ground',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.6,
-                position: { x: 0.3, y: -1.1, z: 0.5 }, // Front center - much further from west
-                // Energetic, quick rhythms - like young flower
-                swirl: 6500, spin: 4200, breathe: 1100, sway: 7800,
-                pulse: 2100, tilt: 3600, orbit: 5900
+                position: { x: -1.2, y: -1.1, z: -0.5 }, // Much lower
+                swirl: 9000, // Faster rhythm - energetic
+                spin: 7500,
+                breathe: 1800,
+                sway: 14000
             },
             {
                 id: 'west-ground',
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.8, y: -1.2, z: -3.0 }, // Far left and back - well separated from south
-                // Very slow, wise rhythms - like ancient moss
-                swirl: 35000, spin: 42000, breathe: 5500, sway: 25000,
-                pulse: 8200, tilt: 16000, orbit: 28000
+                position: { x: -2.2, y: -1.2, z: -2.5 }, // Deep ground
+                swirl: 20000, // Very slow - ancient rhythm
+                spin: 25000,
+                breathe: 3500,
+                sway: 16000
             },
             {
                 id: 'north-ground',
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.2, y: -1.2, z: -4.5 }, // Back right
-                // Steady, rhythmic patterns - like ocean plant
-                swirl: 14500, spin: 11800, breathe: 2600, sway: 12200,
-                pulse: 3900, tilt: 7100, orbit: 13400
+                position: { x: 1.5, y: -1.2, z: -3.8 }, // Much lower
+                swirl: 12000, // Medium rhythm - balanced
+                spin: 14000,
+                breathe: 2200,
+                sway: 11000
             }
         ];
 
@@ -434,33 +438,36 @@
             
             container.appendChild(memory);
             
-            // Simplified sequence with immediate visibility
+            // Perfect sequence with visible growth and slower movement
             memory.addEventListener('model-loaded', function() {
-                // 1. Immediately start emergence - piece is already visible at center
+                // 1. Immediately start emergence (piece already visible)
                 setTimeout(() => {
                     memory.emit('emergeAtCenter');
-                    memory.emit('growAtCenter');
-                    memory.emit('centerSwirl');
                 }, 100);
                 
-                // 2. Move to final position after growth
+                // 2. Start SLOW, visible growing and swirling at center
+                setTimeout(() => {
+                    memory.emit('growAtCenter');
+                    memory.emit('centerSwirl');
+                }, 500);
+                
+                // 3. Move to final position after growth completes - SLOWER timing
                 setTimeout(() => {
                     memory.emit('moveToFinalPosition');
-                }, 12100);
+                }, 15500);
                 
-                // 3. Start all organic life motions
+                // 4. Start EXAGGERATED organic life motions at final position
                 setTimeout(() => {
                     memory.emit('finalFloat');
                     memory.emit('finalSwirl');
                     memory.emit('rapidSpin');
                     memory.emit('finalPulse');
+                    memory.emit('deepBreath');
                     memory.emit('orbitalFloat');
                     memory.emit('organicSway');
                     memory.emit('cellularPulse');
                     memory.emit('dramaticTilt');
-                    memory.emit('spiralDance');
-                    memory.emit('waveMotion');
-                }, 20100);
+                }, 30500);
             });
             
             awakenedMemories.add(memoryConfig.id);
@@ -487,19 +494,10 @@
             makeDraggable(dot, memory);
         });
 
-        // Zoom functionality for detailed examination
-        let currentZoom = 1.0;
-        let isZooming = false;
+        // Zoom for detailed ground observation
         let lastTouchDistance = 0;
+        let isZooming = false;
 
-        // Mouse wheel zoom
-        document.addEventListener('wheel', function(e) {
-            e.preventDefault();
-            const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1;
-            adjustZoom(zoomDelta);
-        });
-
-        // Touch zoom for mobile
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length === 2) {
                 isZooming = true;
@@ -522,8 +520,8 @@
                     Math.pow(touch2.clientY - touch1.clientY, 2)
                 );
                 
-                const zoomFactor = currentDistance / lastTouchDistance;
-                adjustZoom(zoomFactor);
+                const scale = currentDistance / lastTouchDistance;
+                observeGround(scale);
                 lastTouchDistance = currentDistance;
                 e.preventDefault();
             }
@@ -535,21 +533,19 @@
             }
         });
 
-        function adjustZoom(zoomFactor) {
-            currentZoom *= zoomFactor;
-            currentZoom = Math.max(0.3, Math.min(3.0, currentZoom)); // Limit zoom range
-            
-            const camera = document.querySelector('a-entity[camera]');
-            if (camera) {
-                const currentPos = camera.getAttribute('position');
-                const baseDistance = 0.3; // Base camera distance from ground
-                const newY = baseDistance * currentZoom;
-                camera.setAttribute('position', `${currentPos.x} ${newY} ${currentPos.z}`);
-                
-                // Adjust field of view for zoom effect
-                const currentFov = 80 / currentZoom;
-                camera.setAttribute('camera', `fov: ${Math.max(20, Math.min(120, currentFov))}`);
-            }
+        function observeGround(scaleFactor) {
+            awakenedMemories.forEach(memoryId => {
+                const memory = document.getElementById(memoryId);
+                if (memory && memory.getAttribute('visible')) {
+                    const currentScale = memory.getAttribute('scale');
+                    const newScale = {
+                        x: Math.max(0.3, Math.min(1.2, currentScale.x * scaleFactor)),
+                        y: Math.max(0.3, Math.min(1.2, currentScale.y * scaleFactor)),
+                        z: Math.max(0.3, Math.min(1.2, currentScale.z * scaleFactor))
+                    };
+                    memory.setAttribute('scale', newScale);
+                }
+            });
         }
 
         // Reset ground awareness
