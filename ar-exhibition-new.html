@@ -152,38 +152,6 @@
             backdrop-filter: blur(3px);
             font-weight: 300;
         }
-        
-        .view-controls {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-        }
-        
-        .view-btn {
-            background: rgba(0,0,0,0.6);
-            color: rgba(255,255,255,0.9);
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 9px;
-            cursor: pointer;
-            pointer-events: all;
-            backdrop-filter: blur(3px);
-            transition: all 0.3s ease;
-        }
-        
-        .view-btn:active {
-            background: rgba(255,255,255,0.2);
-            transform: scale(0.95);
-        }
-        
-        .view-btn.active {
-            background: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.6);
-        }
     </style>
 </head>
 <body>
@@ -202,8 +170,7 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Channel elemental energies to center<br>
-            <small>After emergence: drag up/down to change view angle, double-tap to rotate</small>
+            Channel elemental energies to center
         </div>
         
         <div class="awareness-counter" id="progress">
@@ -219,16 +186,9 @@
         <!-- Center target -->
         <div class="center-target" id="centerTarget"></div>
         
-        <!-- View control buttons -->
-        <div class="view-controls" id="viewControls">
-            <button class="view-btn" id="viewHigh">👁️ High</button>
-            <button class="view-btn" id="viewNormal">👁️ Normal</button>
-            <button class="view-btn" id="viewLow">👁️ Low</button>
-        </div>
-        
         <div class="ground-complete" id="groundComplete">
             Elemental convergence complete<br>
-            <small>Use view buttons • Double-tap Geloras to rotate</small>
+            <small>Observe the awakened Gelora</small>
         </div>
     </div>
 
@@ -249,8 +209,8 @@
                 element: 'fire',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.6,
-                position: { x: -1.2, y: -0.6, z: -0.5 },
+                scale: 0.48, // Resized: 0.6 * 0.8 = 0.48
+                position: { x: -1.8, y: -0.6, z: -0.5 }, // Moved further from metal (was -1.2)
                 motionType: 'energetic-burst'
             },
             {
@@ -259,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.2, y: -0.7, z: -2.5 },
+                position: { x: -2.8, y: -0.7, z: -2.5 }, // Moved further from fire (was -2.2)
                 motionType: 'crystalline-precise'
             },
             {
@@ -330,6 +290,12 @@
                         'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
+                    
+                    // WOOD BREATHING: Deep, slow like ancient tree
+                    memory.setAttribute('animation__wood-breathing', 
+                        `property: scale; from: ${scale * 0.98} ${scale * 0.98} ${scale * 0.98}; to: ${scale * 1.03} ${scale * 1.03} ${scale * 1.03}; ` +
+                        'dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
                     break;
 
                 case 'fire':
@@ -355,10 +321,10 @@
                         'dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // Slower heartbeat-like pulsing (like breathing heart)
-                    memory.setAttribute('animation__fire-heartbeat', 
-                        `property: scale; from: ${scale * 0.95} ${scale * 0.95} ${scale * 0.95}; to: ${scale * 1.05} ${scale * 1.05} ${scale * 1.05}; ` +
-                        'dir: alternate; dur: 1800; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    // FIRE BREATHING: Quick, erratic like flickering flame
+                    memory.setAttribute('animation__fire-breathing', 
+                        `property: scale; from: ${scale * 0.92} ${scale * 0.92} ${scale * 0.92}; to: ${scale * 1.08} ${scale * 1.08} ${scale * 1.08}; ` +
+                        'dir: alternate; dur: 1200; easing: easeInOutQuad; loop: true; startEvents: finalMotion'
                     );
                     break;
 
@@ -385,6 +351,12 @@
                         'property: rotation; from: -10 0 0; to: 10 0 0; ' +
                         'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
+                    
+                    // METAL BREATHING: Mechanical, precise like machinery
+                    memory.setAttribute('animation__metal-breathing', 
+                        `property: scale; from: ${scale * 0.995} ${scale * 0.995} ${scale * 0.995}; to: ${scale * 1.015} ${scale * 1.015} ${scale * 1.015}; ` +
+                        'dir: alternate; dur: 3000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
                     break;
 
                 case 'water':
@@ -409,6 +381,12 @@
                     memory.setAttribute('animation__water-undulate', 
                         'property: position; from: 0 0.1 -1.5; to: 0 0.25 -1.5; ' +
                         'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // WATER BREATHING: Flowing, wave-like rhythm
+                    memory.setAttribute('animation__water-breathing', 
+                        `property: scale; from: ${scale * 0.97} ${scale * 0.97} ${scale * 0.97}; to: ${scale * 1.04} ${scale * 1.04} ${scale * 1.04}; ` +
+                        'dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
             }
@@ -496,16 +474,10 @@
             memory.setAttribute('scale', '0.01 0.01 0.01');
             memory.setAttribute('visible', false);
             
-            // Add A-Frame interaction components
-            memory.setAttribute('cursor-listener', '');
-            memory.setAttribute('look-at', '[camera]');
-            memory.setAttribute('geometry', 'primitive: box; width: 1; height: 2; depth: 1');
-            memory.setAttribute('material', 'opacity: 0; transparent: true');
-            
             // Apply elemental-specific emergence and growth
             applyElementalMotion(memory, memoryConfig.element, memoryConfig.scale);
             
-            // Movement to final position
+            // Movement to final position (same timing for all)
             memory.setAttribute('animation__move-to-final', 
                 'property: position; ' +
                 `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
@@ -514,31 +486,7 @@
             
             container.appendChild(memory);
             
-            // Simple keyboard controls as backup
-            document.addEventListener('keydown', function(e) {
-                const allGeloras = document.querySelectorAll('[id$="-gelora"]');
-                allGeloras.forEach(gelora => {
-                    const pos = gelora.getAttribute('position');
-                    const rot = gelora.getAttribute('rotation');
-                    
-                    switch(e.key) {
-                        case 'ArrowUp':
-                            gelora.setAttribute('position', `${pos.x} ${pos.y + 0.2} ${pos.z}`);
-                            break;
-                        case 'ArrowDown':
-                            gelora.setAttribute('position', `${pos.x} ${pos.y - 0.2} ${pos.z}`);
-                            break;
-                        case ' ': // Spacebar
-                            gelora.setAttribute('rotation', `${rot.x} ${rot.y + 90} ${rot.z}`);
-                            break;
-                    }
-                });
-            });
-            
             memory.addEventListener('model-loaded', function() {
-                console.log('Model loaded:', memoryConfig.id);
-                console.log('Use Arrow Keys ↑↓ to move vertically, Spacebar to rotate');
-                
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('emergeAtCenter');
@@ -551,6 +499,7 @@
                     }
                 }, 500);
                 
+                // Move to final position after emergence completes
                 const emergeDuration = memoryConfig.element === 'fire' ? 1400 : 
                                      memoryConfig.element === 'wood' ? 15000 :
                                      memoryConfig.element === 'water' ? 3500 : 2500;
@@ -559,8 +508,10 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
+                // Start final elemental motion + enable double-tap rotation
                 setTimeout(() => {
                     memory.emit('finalMotion');
+                    enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -577,24 +528,65 @@
                     document.getElementById('instructions').style.display = 'none';
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
-                    // View controls are already visible
                 }, 2000);
             }
         }
 
-        // Initialize view controls immediately when page loads
-        window.addEventListener('DOMContentLoaded', function() {
-            initializeViewControls();
-        });
+        // Double-tap rotation for Geloras
+        function enableDoubleTapRotation(memory) {
+            let tapCount = 0;
+            let tapTimer = null;
+            let lastTapTime = 0;
+            
+            // Add cursor component to make it clickable
+            memory.setAttribute('cursor', 'rayOrigin: mouse');
+            
+            // Use A-Frame's click event
+            memory.addEventListener('click', handleClick);
+            
+            function handleClick(e) {
+                const currentTime = Date.now();
+                
+                // Check if this is a double-tap (within 400ms of previous tap)
+                if (currentTime - lastTapTime < 400) {
+                    // Double-tap detected!
+                    rotateGelora90Degrees(memory);
+                    lastTapTime = 0; // Reset to prevent triple-tap
+                } else {
+                    // First tap
+                    lastTapTime = currentTime;
+                }
+                
+                e.stopPropagation();
+            }
+            
+            function rotateGelora90Degrees(memory) {
+                // Get current rotation
+                const currentRotation = memory.getAttribute('rotation');
+                const newRotationY = currentRotation.y + 90;
+                
+                // Use A-Frame animation component
+                memory.setAttribute('animation__manual-rotate', {
+                    property: 'rotation',
+                    from: `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`,
+                    to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
+                    dur: 800,
+                    easing: 'easeInOutQuad'
+                });
+                
+                // Update rotation after animation
+                setTimeout(() => {
+                    memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                    memory.removeAttribute('animation__manual-rotate');
+                }, 800);
+            }
+        }
 
         // Initialize draggable dots
         elementalMemories.forEach(memory => {
             const dot = document.getElementById(memory.dotId);
             makeDraggable(dot, memory);
         });
-
-        // Add instructions for keyboard controls
-        document.getElementById('instructions').innerHTML = 'Drag dots to center<br><small>After Geloras appear: ↑↓ arrows = move, Space = rotate</small>';
 
         // Zoom functionality
         let lastTouchDistance = 0;
@@ -661,7 +653,7 @@
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Channel elemental energies to center<br><small>After emergence: drag up/down to move, double-tap to rotate</small>';
+            document.getElementById('instructions').innerHTML = 'Channel elemental energies to center';
             document.getElementById('centerTarget').style.display = 'block';
             document.getElementById('groundComplete').style.display = 'none';
             
