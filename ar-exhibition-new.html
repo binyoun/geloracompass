@@ -449,29 +449,48 @@
         function awakenElementalMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
+            // Create wrapper entity for Gelora + interaction plane
+            const wrapper = document.createElement('a-entity');
+            wrapper.setAttribute('id', memoryConfig.id + '-wrapper');
+            wrapper.setAttribute('position', '0 -1.0 -1.5');
+            
+            // Create the Gelora model
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', '0 -1.0 -1.5');
+            memory.setAttribute('position', '0 0 0'); // Relative to wrapper
             memory.setAttribute('scale', '0.01 0.01 0.01');
             memory.setAttribute('visible', false);
             
-            // Apply elemental-specific emergence and growth
+            // Create invisible interaction plane
+            const interactionPlane = document.createElement('a-plane');
+            interactionPlane.setAttribute('id', memoryConfig.id + '-interaction');
+            interactionPlane.setAttribute('width', '2');
+            interactionPlane.setAttribute('height', '3');
+            interactionPlane.setAttribute('position', '0 0.5 0');
+            interactionPlane.setAttribute('rotation', '0 0 0');
+            interactionPlane.setAttribute('material', 'opacity: 0; transparent: true');
+            interactionPlane.setAttribute('visible', true);
+            
+            // Apply elemental-specific emergence and growth to memory
             applyElementalMotion(memory, memoryConfig.element, memoryConfig.scale);
             
-            // Movement to final position (same timing for all)
-            memory.setAttribute('animation__move-to-final', 
+            // Movement to final position for wrapper
+            wrapper.setAttribute('animation__move-to-final', 
                 'property: position; ' +
-                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `from: 0 -1.0 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
                 'dur: 8000; easing: easeInOutQuart; startEvents: moveToFinal'
             );
             
-            container.appendChild(memory);
+            // Add memory and interaction plane to wrapper
+            wrapper.appendChild(memory);
+            wrapper.appendChild(interactionPlane);
+            container.appendChild(wrapper);
+            
+            // Enable interaction on the plane instead of the model
+            enableGeloraInteraction(memory, interactionPlane);
             
             memory.addEventListener('model-loaded', function() {
-                // Enable interaction immediately when model loads
-                enableGeloraInteraction(memory);
-                
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('emergeAtCenter');
@@ -484,13 +503,13 @@
                     }
                 }, 500);
                 
-                // Move to final position after emergence completes
+                // Move wrapper to final position after emergence completes
                 const emergeDuration = memoryConfig.element === 'fire' ? 1400 : 
                                      memoryConfig.element === 'wood' ? 15000 :
                                      memoryConfig.element === 'water' ? 3500 : 2500;
                 
                 setTimeout(() => {
-                    memory.emit('moveToFinal');
+                    wrapper.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
                 // Start final elemental motion
@@ -516,26 +535,29 @@
             }
         }
 
-        // Ultra-simple interaction for Geloras - works on all devices
-        function enableGeloraInteraction(memory) {
+        // Ultra-simple interaction using invisible clickable plane
+        function enableGeloraInteraction(memory, interactionPlane) {
             let touchStartY = 0;
-            let lastTouchY = 0;
             let isMoving = false;
             let lastTapTime = 0;
             
-            // Simple touch handling that definitely works
-            memory.addEventListener('touchstart', function(e) {
+            // Add visual indicator that plane is working
+            console.log('Interaction enabled for:', memory.id);
+            
+            // Touch events on the invisible plane
+            interactionPlane.addEventListener('touchstart', function(e) {
                 touchStartY = e.touches[0].clientY;
-                lastTouchY = touchStartY;
                 isMoving = false;
                 
-                // Add visual feedback to confirm touch is detected
-                memory.setAttribute('scale', '1.1 1.1 1.1');
+                // Visual feedback - make Gelora bigger
+                const currentScale = memory.getAttribute('scale');
+                memory.setAttribute('scale', `${currentScale.x * 1.1} ${currentScale.y * 1.1} ${currentScale.z * 1.1}`);
                 
+                console.log('Touch started on', memory.id);
                 e.preventDefault();
             });
             
-            memory.addEventListener('touchmove', function(e) {
+            interactionPlane.addEventListener('touchmove', function(e) {
                 if (touchStartY === 0) return;
                 
                 const currentY = e.touches[0].clientY;
@@ -545,19 +567,19 @@
                 if (Math.abs(deltaY) > 20) {
                     isMoving = true;
                     
-                    // Get current position
-                    const pos = memory.getAttribute('position');
-                    
-                    // Move vertically with simple calculation
+                    // Move the wrapper instead of just the memory
+                    const wrapper = memory.parentElement;
+                    const pos = wrapper.getAttribute('position');
                     const newY = pos.y + (deltaY * 0.01);
-                    memory.setAttribute('position', `${pos.x} ${newY} ${pos.z}`);
+                    wrapper.setAttribute('position', `${pos.x} ${newY} ${pos.z}`);
+                    
+                    console.log('Dragging', memory.id, 'to Y:', newY);
                 }
                 
-                lastTouchY = currentY;
                 e.preventDefault();
             });
             
-            memory.addEventListener('touchend', function(e) {
+            interactionPlane.addEventListener('touchend', function(e) {
                 // Return to normal scale
                 const currentScale = memory.getAttribute('scale');
                 memory.setAttribute('scale', `${currentScale.x / 1.1} ${currentScale.y / 1.1} ${currentScale.z / 1.1}`);
@@ -571,74 +593,58 @@
                 touchStartY = 0;
                 isMoving = false;
                 
+                console.log('Touch ended on', memory.id);
+                e.preventDefault();
+            });
+            
+            // Mouse events for desktop
+            interactionPlane.addEventListener('mousedown', function(e) {
+                const currentScale = memory.getAttribute('scale');
+                memory.setAttribute('scale', `${currentScale.x * 1.1} ${currentScale.y * 1.1} ${currentScale.z * 1.1}`);
+                console.log('Mouse down on', memory.id);
+                e.preventDefault();
+            });
+            
+            interactionPlane.addEventListener('mouseup', function(e) {
+                const currentScale = memory.getAttribute('scale');
+                memory.setAttribute('scale', `${currentScale.x / 1.1} ${currentScale.y / 1.1} ${currentScale.z / 1.1}`);
+                console.log('Mouse up on', memory.id);
+                e.preventDefault();
+            });
+            
+            // Double-click for desktop
+            interactionPlane.addEventListener('dblclick', function(e) {
+                handleRotation(memory);
                 e.preventDefault();
             });
             
             // Simple double-tap detection
             function handleTap(memory) {
                 const now = Date.now();
+                console.log('Tap on', memory.id);
                 
                 if (now - lastTapTime < 400) {
-                    // Double tap! Rotate 90 degrees
-                    const rot = memory.getAttribute('rotation');
-                    memory.setAttribute('rotation', `${rot.x} ${rot.y + 90} ${rot.z}`);
-                    
-                    // Visual feedback for rotation
-                    memory.setAttribute('scale', '1.2 1.2 1.2');
-                    setTimeout(() => {
-                        const scale = memory.getAttribute('scale');
-                        memory.setAttribute('scale', `${scale.x / 1.2} ${scale.y / 1.2} ${scale.z / 1.2}`);
-                    }, 200);
-                    
-                    lastTapTime = 0; // Prevent triple tap
+                    console.log('Double-tap detected on', memory.id);
+                    handleRotation(memory);
+                    lastTapTime = 0;
                 } else {
                     lastTapTime = now;
                 }
             }
             
-            // Also add mouse support for desktop
-            let mouseDown = false;
-            let mouseStartY = 0;
-            
-            memory.addEventListener('mousedown', function(e) {
-                mouseDown = true;
-                mouseStartY = e.clientY;
-                memory.setAttribute('scale', '1.1 1.1 1.1');
-                e.preventDefault();
-            });
-            
-            document.addEventListener('mousemove', function(e) {
-                if (!mouseDown) return;
-                
-                const deltaY = mouseStartY - e.clientY;
-                const pos = memory.getAttribute('position');
-                const newY = pos.y + (deltaY * 0.01);
-                memory.setAttribute('position', `${pos.x} ${newY} ${pos.z}`);
-                
-                mouseStartY = e.clientY;
-            });
-            
-            document.addEventListener('mouseup', function(e) {
-                if (mouseDown) {
-                    const currentScale = memory.getAttribute('scale');
-                    memory.setAttribute('scale', `${currentScale.x / 1.1} ${currentScale.y / 1.1} ${currentScale.z / 1.1}`);
-                    mouseDown = false;
-                }
-            });
-            
-            // Double-click for desktop
-            memory.addEventListener('dblclick', function(e) {
+            function handleRotation(memory) {
                 const rot = memory.getAttribute('rotation');
                 memory.setAttribute('rotation', `${rot.x} ${rot.y + 90} ${rot.z}`);
                 
+                // Visual feedback for rotation
                 memory.setAttribute('scale', '1.2 1.2 1.2');
                 setTimeout(() => {
                     const scale = memory.getAttribute('scale');
                     memory.setAttribute('scale', `${scale.x / 1.2} ${scale.y / 1.2} ${scale.z / 1.2}`);
-                }, 200);
+                }, 300);
                 
-                e.preventDefault();
-            });
+                console.log('Rotated', memory.id, 'to', rot.y + 90, 'degrees');
+            }
         }
 
         // Initialize draggable dots
