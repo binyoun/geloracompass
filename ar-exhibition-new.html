@@ -152,6 +152,38 @@
             backdrop-filter: blur(3px);
             font-weight: 300;
         }
+        
+        .view-controls {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 9px;
+            cursor: pointer;
+            pointer-events: all;
+            backdrop-filter: blur(3px);
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn:active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.95);
+        }
+        
+        .view-btn.active {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.6);
+        }
     </style>
 </head>
 <body>
@@ -187,9 +219,16 @@
         <!-- Center target -->
         <div class="center-target" id="centerTarget"></div>
         
+        <!-- View control buttons -->
+        <div class="view-controls" id="viewControls" style="display: none;">
+            <button class="view-btn" id="viewHigh">👁️ High</button>
+            <button class="view-btn" id="viewNormal">👁️ Normal</button>
+            <button class="view-btn" id="viewLow">👁️ Low</button>
+        </div>
+        
         <div class="ground-complete" id="groundComplete">
             Elemental convergence complete<br>
-            <small>Observe the awakened Gelora</small>
+            <small>Use view buttons • Double-tap Geloras to rotate</small>
         </div>
     </div>
 
@@ -538,6 +577,10 @@
                     document.getElementById('instructions').style.display = 'none';
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
+                    document.getElementById('viewControls').style.display = 'flex';
+                    
+                    // Initialize view controls when all Geloras are present
+                    initializeViewControls();
                 }, 2000);
             }
         }
