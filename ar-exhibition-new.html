@@ -514,103 +514,117 @@
             }
         }
 
-        // Simple vertical dragging and double-tap for Geloras
+        // Mobile-friendly vertical dragging and double-tap for Geloras
         function enableGeloraInteraction(memory) {
             let isDragging = false;
             let startY = 0;
             let originalY = 0;
             let lastTapTime = 0;
-            let tapCount = 0;
+            let interactionStarted = false;
             
-            // Make the Gelora interactive by adding raycaster target
+            // Make the Gelora interactive
             memory.setAttribute('class', 'interactive');
             
-            // Touch/Mouse start
+            // Desktop events
             memory.addEventListener('mousedown', startInteraction);
-            memory.addEventListener('touchstart', startInteraction, { passive: false });
+            
+            // Mobile touch events - directly on the memory element
+            memory.addEventListener('touchstart', function(e) {
+                startInteraction(e);
+                e.preventDefault();
+                e.stopPropagation();
+            }, { passive: false });
             
             function startInteraction(e) {
-                const currentTime = Date.now();
+                interactionStarted = true;
+                isDragging = false;
                 
-                // Get Y coordinate
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                startY = clientY;
+                // Get Y coordinate (handle both mouse and touch)
+                if (e.touches && e.touches.length > 0) {
+                    startY = e.touches[0].clientY;
+                } else {
+                    startY = e.clientY;
+                }
                 
                 // Get current position
                 const pos = memory.getAttribute('position');
                 originalY = pos.y;
                 
-                // Start drag detection
-                isDragging = false;
-                
-                e.preventDefault();
-                e.stopPropagation();
+                console.log('Interaction started on Gelora'); // Debug
             }
             
-            // Touch/Mouse move
+            // Movement handlers
             document.addEventListener('mousemove', handleMove);
             document.addEventListener('touchmove', handleMove, { passive: false });
             
             function handleMove(e) {
-                if (startY === 0) return; // No active touch
+                if (!interactionStarted) return;
                 
-                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                const deltaY = startY - clientY;
+                let currentY;
+                if (e.touches && e.touches.length > 0) {
+                    currentY = e.touches[0].clientY;
+                } else {
+                    currentY = e.clientY;
+                }
                 
-                // If moved more than 10px, it's a drag
-                if (Math.abs(deltaY) > 10) {
+                const deltaY = startY - currentY;
+                
+                // If moved more than 15px, it's a drag
+                if (Math.abs(deltaY) > 15) {
                     isDragging = true;
                     
                     // Update vertical position
-                    const sensitivity = 0.005;
+                    const sensitivity = 0.008; // Increased for mobile
                     const newY = originalY + (deltaY * sensitivity);
                     
                     // Clamp to reasonable range
-                    const clampedY = Math.max(originalY - 1.5, Math.min(originalY + 1.5, newY));
+                    const clampedY = Math.max(originalY - 2.0, Math.min(originalY + 2.0, newY));
                     
                     // Update position
                     const pos = memory.getAttribute('position');
                     memory.setAttribute('position', `${pos.x} ${clampedY} ${pos.z}`);
+                    
+                    console.log('Dragging Gelora vertically'); // Debug
                 }
                 
                 e.preventDefault();
             }
             
-            // Touch/Mouse end
+            // End interaction handlers
             document.addEventListener('mouseup', endInteraction);
             document.addEventListener('touchend', endInteraction);
             
             function endInteraction(e) {
-                if (startY === 0) return; // No active interaction
+                if (!interactionStarted) return;
                 
                 // If it wasn't a drag, treat as tap
                 if (!isDragging) {
                     handleTap();
                 }
                 
-                // Reset
+                // Reset all states
                 isDragging = false;
+                interactionStarted = false;
                 startY = 0;
                 originalY = 0;
                 
-                e.preventDefault();
+                console.log('Interaction ended'); // Debug
             }
             
             function handleTap() {
-                tapCount++;
+                const currentTime = Date.now();
+                console.log('Tap detected on Gelora'); // Debug
                 
-                if (tapCount === 1) {
-                    // Wait for potential second tap
-                    setTimeout(() => {
-                        if (tapCount === 1) {
-                            // Single tap - do nothing or add single tap action
-                            tapCount = 0;
-                        }
-                    }, 300);
-                } else if (tapCount === 2) {
-                    // Double tap detected!
-                    tapCount = 0;
+                // Check if this is within double-tap window
+                if (currentTime - lastTapTime < 500) {
+                    // Double tap!
+                    console.log('Double-tap detected! Rotating Gelora'); // Debug
                     rotateGelora(memory);
+                    lastTapTime = 0; // Reset to prevent triple-tap
+                } else {
+                    // First tap
+                    lastTapTime = currentTime;
+                    console.log('First tap, waiting for second tap'); // Debug
                 }
             }
             
@@ -618,10 +632,15 @@
                 const rotation = memory.getAttribute('rotation');
                 const newRotationY = rotation.y + 90;
                 
-                // Simple direct rotation update
-                memory.setAttribute('rotation', `${rotation.x} ${newRotationY} ${rotation.z}`);
+                // Use A-Frame animation for smooth rotation
+                memory.setAttribute('animation__user-rotate', {
+                    property: 'rotation',
+                    to: `${rotation.x} ${newRotationY} ${rotation.z}`,
+                    dur: 500,
+                    easing: 'easeInOutQuad'
+                });
                 
-                console.log('Gelora rotated 90 degrees'); // Debug log
+                console.log('Gelora rotated 90 degrees to Y:', newRotationY); // Debug
             }
         }
 
