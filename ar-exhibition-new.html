@@ -279,9 +279,15 @@
                         'dur: 15000; easing: easeOutElastic; startEvents: growAtCenter'
                     );
                     
-                    // Gentle tree swaying
+                    // Slow, organic 360-degree rotation like seasonal growth
+                    memory.setAttribute('animation__wood-rotate360', 
+                        'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                        'dur: 25000; easing: linear; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Gentle tree swaying (z-axis)
                     memory.setAttribute('animation__wood-sway', 
-                        'property: rotation; from: 0 0 -2; to: 0 0 2; ' +
+                        'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
@@ -303,10 +309,16 @@
                         'dur: 600; easing: easeInQuart; startEvents: settleScale'
                     );
                     
-                    // Flickering energy pulse
-                    memory.setAttribute('animation__fire-flicker', 
-                        `property: scale; from: ${scale * 0.95} ${scale * 0.95} ${scale * 0.95}; to: ${scale * 1.1} ${scale * 1.1} ${scale * 1.1}; ` +
-                        'dir: alternate; dur: 400; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    // Dynamic dancing 360-degree rotation like flickering flames
+                    memory.setAttribute('animation__fire-rotate360', 
+                        'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                        'dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Slower heartbeat-like pulsing (like breathing heart)
+                    memory.setAttribute('animation__fire-heartbeat', 
+                        `property: scale; from: ${scale * 0.95} ${scale * 0.95} ${scale * 0.95}; to: ${scale * 1.05} ${scale * 1.05} ${scale * 1.05}; ` +
+                        'dir: alternate; dur: 1800; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
 
@@ -322,10 +334,16 @@
                         'dur: 2500; easing: easeOutCubic; startEvents: growAtCenter'
                     );
                     
-                    // Precise geometric rotation
-                    memory.setAttribute('animation__metal-rotate', 
-                        'property: rotation; from: 0 0 0; to: 0 90 0; ' +
-                        'dur: 8000; easing: linear; loop: true; startEvents: finalMotion'
+                    // Precise, mechanical 360-degree rotation with pauses
+                    memory.setAttribute('animation__metal-rotate360', 
+                        'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                        'dur: 12000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Additional geometric tilt rotation (x-axis)
+                    memory.setAttribute('animation__metal-tilt', 
+                        'property: rotation; from: -10 0 0; to: 10 0 0; ' +
+                        'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     break;
 
@@ -341,7 +359,13 @@
                         'dur: 3500; easing: easeOutElastic; startEvents: growAtCenter'
                     );
                     
-                    // Flowing undulation
+                    // Gentle, flowing 360-degree rotation like water currents
+                    memory.setAttribute('animation__water-rotate360', 
+                        'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                        'dur: 18000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Flowing undulation (vertical movement)
                     memory.setAttribute('animation__water-undulate', 
                         'property: position; from: 0 0.1 -1.5; to: 0 0.25 -1.5; ' +
                         'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
