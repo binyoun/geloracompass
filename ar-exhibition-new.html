@@ -434,25 +434,21 @@
             
             container.appendChild(memory);
             
-            // Enhanced sequence with much slower, visible growth
+            // Simplified sequence with immediate visibility
             memory.addEventListener('model-loaded', function() {
-                // 1. Immediately start slow emergence from center dotted circle
+                // 1. Immediately start emergence - piece is already visible at center
                 setTimeout(() => {
                     memory.emit('emergeAtCenter');
-                }, 200);
-                
-                // 2. Start VERY SLOW, clearly visible growing at center
-                setTimeout(() => {
                     memory.emit('growAtCenter');
                     memory.emit('centerSwirl');
-                }, 1000);
+                }, 100);
                 
-                // 3. Move to final position after growth fully completes
+                // 2. Move to final position after growth
                 setTimeout(() => {
                     memory.emit('moveToFinalPosition');
-                }, 21000);
+                }, 12100);
                 
-                // 4. Start ALL exaggerated organic life motions
+                // 3. Start all organic life motions
                 setTimeout(() => {
                     memory.emit('finalFloat');
                     memory.emit('finalSwirl');
@@ -464,7 +460,7 @@
                     memory.emit('dramaticTilt');
                     memory.emit('spiralDance');
                     memory.emit('waveMotion');
-                }, 39000);
+                }, 20100);
             });
             
             awakenedMemories.add(memoryConfig.id);
