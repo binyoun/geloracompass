@@ -327,11 +327,8 @@
                         'dir: alternate; dur: 1800; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // FIRE BREATHING: Quick, intense bursts like flames flickering
-                    memory.setAttribute('animation__fire-breathe', 
-                        `property: scale; from: ${scale * 0.88} ${scale * 0.88} ${scale * 0.88}; to: ${scale * 1.12} ${scale * 1.12} ${scale * 1.12}; ` +
-                        'dir: alternate; dur: 1200; easing: easeInOutBack; loop: true; startEvents: startBreathing'
-                    );
+                    // FIRE BREATHING: Quick, intense bursts like flames flickering (position only)
+                    // Removed scale breathing to avoid conflict with heartbeat animation
                     
                     // Fire breathing with slight position flicker
                     memory.setAttribute('animation__fire-breathe-flicker', 
@@ -401,11 +398,8 @@
                         'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // WATER BREATHING: Fluid, wave-like expansion that mimics tidal breathing
-                    memory.setAttribute('animation__water-breathe', 
-                        `property: scale; from: ${scale * 0.92} ${scale} ${scale * 0.92}; to: ${scale * 1.08} ${scale} ${scale * 1.08}; ` +
-                        'dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: startBreathing'
-                    );
+                    // WATER BREATHING: Fluid, wave-like breathing (position and rotation only)
+                    // Removed scale breathing to keep focus on flowing movements
                     
                     // Water breathing with gentle vertical flow
                     memory.setAttribute('animation__water-breathe-flow', 
