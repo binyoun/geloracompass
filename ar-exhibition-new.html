@@ -449,46 +449,24 @@
         function awakenElementalMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create wrapper entity for Gelora + interaction plane
-            const wrapper = document.createElement('a-entity');
-            wrapper.setAttribute('id', memoryConfig.id + '-wrapper');
-            wrapper.setAttribute('position', '0 -1.0 -1.5');
-            
-            // Create the Gelora model
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', '0 0 0'); // Relative to wrapper
+            memory.setAttribute('position', '0 -1.0 -1.5');
             memory.setAttribute('scale', '0.01 0.01 0.01');
             memory.setAttribute('visible', false);
             
-            // Create invisible interaction plane
-            const interactionPlane = document.createElement('a-plane');
-            interactionPlane.setAttribute('id', memoryConfig.id + '-interaction');
-            interactionPlane.setAttribute('width', '2');
-            interactionPlane.setAttribute('height', '3');
-            interactionPlane.setAttribute('position', '0 0.5 0');
-            interactionPlane.setAttribute('rotation', '0 0 0');
-            interactionPlane.setAttribute('material', 'opacity: 0; transparent: true');
-            interactionPlane.setAttribute('visible', true);
-            
-            // Apply elemental-specific emergence and growth to memory
+            // Apply elemental-specific emergence and growth
             applyElementalMotion(memory, memoryConfig.element, memoryConfig.scale);
             
-            // Movement to final position for wrapper
-            wrapper.setAttribute('animation__move-to-final', 
+            // Movement to final position (same timing for all)
+            memory.setAttribute('animation__move-to-final', 
                 'property: position; ' +
-                `from: 0 -1.0 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
                 'dur: 8000; easing: easeInOutQuart; startEvents: moveToFinal'
             );
             
-            // Add memory and interaction plane to wrapper
-            wrapper.appendChild(memory);
-            wrapper.appendChild(interactionPlane);
-            container.appendChild(wrapper);
-            
-            // Enable interaction on the plane instead of the model
-            enableGeloraInteraction(memory, interactionPlane);
+            container.appendChild(memory);
             
             memory.addEventListener('model-loaded', function() {
                 setTimeout(() => {
@@ -503,18 +481,19 @@
                     }
                 }, 500);
                 
-                // Move wrapper to final position after emergence completes
+                // Move to final position after emergence completes
                 const emergeDuration = memoryConfig.element === 'fire' ? 1400 : 
                                      memoryConfig.element === 'wood' ? 15000 :
                                      memoryConfig.element === 'water' ? 3500 : 2500;
                 
                 setTimeout(() => {
-                    wrapper.emit('moveToFinal');
+                    memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion
+                // Start final elemental motion + enable double-tap rotation
                 setTimeout(() => {
                     memory.emit('finalMotion');
+                    enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -535,115 +514,53 @@
             }
         }
 
-        // Ultra-simple interaction using invisible clickable plane
-        function enableGeloraInteraction(memory, interactionPlane) {
-            let touchStartY = 0;
-            let isMoving = false;
+        // Double-tap rotation for Geloras
+        function enableDoubleTapRotation(memory) {
+            let tapCount = 0;
+            let tapTimer = null;
             let lastTapTime = 0;
             
-            // Add visual indicator that plane is working
-            console.log('Interaction enabled for:', memory.id);
+            // Add cursor component to make it clickable
+            memory.setAttribute('cursor', 'rayOrigin: mouse');
             
-            // Touch events on the invisible plane
-            interactionPlane.addEventListener('touchstart', function(e) {
-                touchStartY = e.touches[0].clientY;
-                isMoving = false;
-                
-                // Visual feedback - make Gelora bigger
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x * 1.1} ${currentScale.y * 1.1} ${currentScale.z * 1.1}`);
-                
-                console.log('Touch started on', memory.id);
-                e.preventDefault();
-            });
+            // Use A-Frame's click event
+            memory.addEventListener('click', handleClick);
             
-            interactionPlane.addEventListener('touchmove', function(e) {
-                if (touchStartY === 0) return;
+            function handleClick(e) {
+                const currentTime = Date.now();
                 
-                const currentY = e.touches[0].clientY;
-                const deltaY = touchStartY - currentY;
-                
-                // If moved more than 20px, start dragging
-                if (Math.abs(deltaY) > 20) {
-                    isMoving = true;
-                    
-                    // Move the wrapper instead of just the memory
-                    const wrapper = memory.parentElement;
-                    const pos = wrapper.getAttribute('position');
-                    const newY = pos.y + (deltaY * 0.01);
-                    wrapper.setAttribute('position', `${pos.x} ${newY} ${pos.z}`);
-                    
-                    console.log('Dragging', memory.id, 'to Y:', newY);
-                }
-                
-                e.preventDefault();
-            });
-            
-            interactionPlane.addEventListener('touchend', function(e) {
-                // Return to normal scale
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x / 1.1} ${currentScale.y / 1.1} ${currentScale.z / 1.1}`);
-                
-                // If it wasn't a drag, treat as tap
-                if (!isMoving) {
-                    handleTap(memory);
-                }
-                
-                // Reset
-                touchStartY = 0;
-                isMoving = false;
-                
-                console.log('Touch ended on', memory.id);
-                e.preventDefault();
-            });
-            
-            // Mouse events for desktop
-            interactionPlane.addEventListener('mousedown', function(e) {
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x * 1.1} ${currentScale.y * 1.1} ${currentScale.z * 1.1}`);
-                console.log('Mouse down on', memory.id);
-                e.preventDefault();
-            });
-            
-            interactionPlane.addEventListener('mouseup', function(e) {
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x / 1.1} ${currentScale.y / 1.1} ${currentScale.z / 1.1}`);
-                console.log('Mouse up on', memory.id);
-                e.preventDefault();
-            });
-            
-            // Double-click for desktop
-            interactionPlane.addEventListener('dblclick', function(e) {
-                handleRotation(memory);
-                e.preventDefault();
-            });
-            
-            // Simple double-tap detection
-            function handleTap(memory) {
-                const now = Date.now();
-                console.log('Tap on', memory.id);
-                
-                if (now - lastTapTime < 400) {
-                    console.log('Double-tap detected on', memory.id);
-                    handleRotation(memory);
-                    lastTapTime = 0;
+                // Check if this is a double-tap (within 400ms of previous tap)
+                if (currentTime - lastTapTime < 400) {
+                    // Double-tap detected!
+                    rotateGelora90Degrees(memory);
+                    lastTapTime = 0; // Reset to prevent triple-tap
                 } else {
-                    lastTapTime = now;
+                    // First tap
+                    lastTapTime = currentTime;
                 }
+                
+                e.stopPropagation();
             }
             
-            function handleRotation(memory) {
-                const rot = memory.getAttribute('rotation');
-                memory.setAttribute('rotation', `${rot.x} ${rot.y + 90} ${rot.z}`);
+            function rotateGelora90Degrees(memory) {
+                // Get current rotation
+                const currentRotation = memory.getAttribute('rotation');
+                const newRotationY = currentRotation.y + 90;
                 
-                // Visual feedback for rotation
-                memory.setAttribute('scale', '1.2 1.2 1.2');
+                // Use A-Frame animation component
+                memory.setAttribute('animation__manual-rotate', {
+                    property: 'rotation',
+                    from: `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`,
+                    to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
+                    dur: 800,
+                    easing: 'easeInOutQuad'
+                });
+                
+                // Update rotation after animation
                 setTimeout(() => {
-                    const scale = memory.getAttribute('scale');
-                    memory.setAttribute('scale', `${scale.x / 1.2} ${scale.y / 1.2} ${scale.z / 1.2}`);
-                }, 300);
-                
-                console.log('Rotated', memory.id, 'to', rot.y + 90, 'degrees');
+                    memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                    memory.removeAttribute('animation__manual-rotate');
+                }, 800);
             }
         }
 
