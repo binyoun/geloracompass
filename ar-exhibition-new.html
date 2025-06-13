@@ -170,7 +170,8 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Channel elemental energies to center
+            Channel elemental energies to center<br>
+            <small>After emergence: drag up/down to move, double-tap to rotate</small>
         </div>
         
         <div class="awareness-counter" id="progress">
@@ -456,10 +457,16 @@
             memory.setAttribute('scale', '0.01 0.01 0.01');
             memory.setAttribute('visible', false);
             
+            // Add A-Frame interaction components
+            memory.setAttribute('cursor-listener', '');
+            memory.setAttribute('look-at', '[camera]');
+            memory.setAttribute('geometry', 'primitive: box; width: 1; height: 2; depth: 1');
+            memory.setAttribute('material', 'opacity: 0; transparent: true');
+            
             // Apply elemental-specific emergence and growth
             applyElementalMotion(memory, memoryConfig.element, memoryConfig.scale);
             
-            // Movement to final position (same timing for all)
+            // Movement to final position
             memory.setAttribute('animation__move-to-final', 
                 'property: position; ' +
                 `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
@@ -468,7 +475,31 @@
             
             container.appendChild(memory);
             
+            // Simple keyboard controls as backup
+            document.addEventListener('keydown', function(e) {
+                const allGeloras = document.querySelectorAll('[id$="-gelora"]');
+                allGeloras.forEach(gelora => {
+                    const pos = gelora.getAttribute('position');
+                    const rot = gelora.getAttribute('rotation');
+                    
+                    switch(e.key) {
+                        case 'ArrowUp':
+                            gelora.setAttribute('position', `${pos.x} ${pos.y + 0.2} ${pos.z}`);
+                            break;
+                        case 'ArrowDown':
+                            gelora.setAttribute('position', `${pos.x} ${pos.y - 0.2} ${pos.z}`);
+                            break;
+                        case ' ': // Spacebar
+                            gelora.setAttribute('rotation', `${rot.x} ${rot.y + 90} ${rot.z}`);
+                            break;
+                    }
+                });
+            });
+            
             memory.addEventListener('model-loaded', function() {
+                console.log('Model loaded:', memoryConfig.id);
+                console.log('Use Arrow Keys ↑↓ to move vertically, Spacebar to rotate');
+                
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('emergeAtCenter');
@@ -481,7 +512,6 @@
                     }
                 }, 500);
                 
-                // Move to final position after emergence completes
                 const emergeDuration = memoryConfig.element === 'fire' ? 1400 : 
                                      memoryConfig.element === 'wood' ? 15000 :
                                      memoryConfig.element === 'water' ? 3500 : 2500;
@@ -490,10 +520,8 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion + enable double-tap rotation
                 setTimeout(() => {
                     memory.emit('finalMotion');
-                    enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -514,61 +542,14 @@
             }
         }
 
-        // Double-tap rotation for Geloras
-        function enableDoubleTapRotation(memory) {
-            let tapCount = 0;
-            let tapTimer = null;
-            let lastTapTime = 0;
-            
-            // Add cursor component to make it clickable
-            memory.setAttribute('cursor', 'rayOrigin: mouse');
-            
-            // Use A-Frame's click event
-            memory.addEventListener('click', handleClick);
-            
-            function handleClick(e) {
-                const currentTime = Date.now();
-                
-                // Check if this is a double-tap (within 400ms of previous tap)
-                if (currentTime - lastTapTime < 400) {
-                    // Double-tap detected!
-                    rotateGelora90Degrees(memory);
-                    lastTapTime = 0; // Reset to prevent triple-tap
-                } else {
-                    // First tap
-                    lastTapTime = currentTime;
-                }
-                
-                e.stopPropagation();
-            }
-            
-            function rotateGelora90Degrees(memory) {
-                // Get current rotation
-                const currentRotation = memory.getAttribute('rotation');
-                const newRotationY = currentRotation.y + 90;
-                
-                // Use A-Frame animation component
-                memory.setAttribute('animation__manual-rotate', {
-                    property: 'rotation',
-                    from: `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`,
-                    to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
-                    dur: 800,
-                    easing: 'easeInOutQuad'
-                });
-                
-                // Update rotation after animation
-                setTimeout(() => {
-                    memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
-                    memory.removeAttribute('animation__manual-rotate');
-                }, 800);
-            }
-        }
-
         // Initialize draggable dots
         elementalMemories.forEach(memory => {
             const dot = document.getElementById(memory.dotId);
             makeDraggable(dot, memory);
         });
+
+        // Add instructions for keyboard controls
+        document.getElementById('instructions').innerHTML = 'Drag dots to center<br><small>After Geloras appear: ↑↓ arrows = move, Space = rotate</small>';
 
         // Zoom functionality
         let lastTouchDistance = 0;
@@ -635,7 +616,7 @@
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Channel elemental energies to center';
+            document.getElementById('instructions').innerHTML = 'Channel elemental energies to center<br><small>After emergence: drag up/down to move, double-tap to rotate</small>';
             document.getElementById('centerTarget').style.display = 'block';
             document.getElementById('groundComplete').style.display = 'none';
             
