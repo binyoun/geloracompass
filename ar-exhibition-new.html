@@ -326,60 +326,71 @@
         function awakenGroundMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create ground memory element
+            // Create ground memory element starting at center
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', 
-                `${memoryConfig.position.x} ${memoryConfig.position.y - 0.8} ${memoryConfig.position.z}`
-            );
+            memory.setAttribute('position', '0 -0.8 -1.5'); // Start at center underground
             memory.setAttribute('scale', '0 0 0');
             memory.setAttribute('visible', false);
             
-            // Ground emergence animation
-            memory.setAttribute('animation__emerge', 
-                'property: position; ' +
-                `from: ${memoryConfig.position.x} ${memoryConfig.position.y - 1.2} ${memoryConfig.position.z}; ` +
-                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
-                'dur: 20000; easing: easeOutQuart; startEvents: emerge'
+            // Center emergence animation - emerge from center first
+            memory.setAttribute('animation__center-emerge', 
+                'property: position; from: 0 -1.2 -1.5; to: 0 0.1 -1.5; ' +
+                'dur: 15000; easing: easeOutQuart; startEvents: centerEmerge'
             );
             
-            // Growing motion
-            memory.setAttribute('animation__grow', 
+            // Growing motion while at center
+            memory.setAttribute('animation__center-grow', 
                 `property: scale; from: 0 0 0; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 25000; easing: easeOutElastic; startEvents: grow'
+                'dur: 18000; easing: easeOutElastic; startEvents: centerGrow'
             );
             
-            // Gentle life breathing
-            memory.setAttribute('animation__breathe', 
+            // Movement to final position after emerging at center
+            memory.setAttribute('animation__move-to-position', 
+                'property: position; ' +
+                `from: 0 0.1 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                'dur: 12000; easing: easeInOutQuart; startEvents: moveToPosition'
+            );
+            
+            // Gentle life breathing at final position
+            memory.setAttribute('animation__final-breathe', 
                 `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
                 `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.18} ${memoryConfig.position.z}; ` +
-                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: breathe'
+                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: finalBreathe'
             );
             
-            // Slow turning for 360° view
-            memory.setAttribute('animation__turn', 
+            // Slow turning for 360° view at final position
+            memory.setAttribute('animation__final-turn', 
                 'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                'dur: 180000; easing: linear; loop: true; startEvents: turn'
+                'dur: 180000; easing: linear; loop: true; startEvents: finalTurn'
             );
             
             container.appendChild(memory);
             
-            // Load and show with ground timing
+            // Load and show with center-first timing sequence
             memory.addEventListener('model-loaded', function() {
+                // 1. Start at center underground
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
-                    memory.emit('emerge');
+                    memory.emit('centerEmerge');
                 }, 500);
                 
+                // 2. Grow while emerging at center
                 setTimeout(() => {
-                    memory.emit('grow');
+                    memory.emit('centerGrow');
                 }, 1000);
                 
+                // 3. Move to final position after center emergence
                 setTimeout(() => {
-                    memory.emit('breathe');
-                    memory.emit('turn');
-                }, 15000);
+                    memory.emit('moveToPosition');
+                }, 16000); // After center emergence completes
+                
+                // 4. Start life motions at final position
+                setTimeout(() => {
+                    memory.emit('finalBreathe');
+                    memory.emit('finalTurn');
+                }, 28000); // After movement completes
             });
             
             awakenedMemories.add(memoryConfig.id);
