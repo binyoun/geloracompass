@@ -188,10 +188,10 @@
     <div class="overlay">
         <div class="start-instructions" id="startInstructions">
             Point your camera toward the ground first<br>
-            <small style="margin-top: 10px; display: block; opacity: 0.8;">Then the experience will begin...</small>
+            <small style="margin-top: 10px; display: block; opacity: 0.8;">Then tap here to begin...</small>
         </div>
         
-        <div class="ground-instructions" id="instructions">
+        <div class="ground-instructions" id="instructions" style="opacity: 0;">
             Drag green dot to center target
         </div>
         
@@ -292,11 +292,21 @@
             return distance < 40; // Within 40px of center target
         }
 
-        // Detect when camera is pointing toward ground
+        // Detect when camera is pointing toward ground - better detection
         function detectGroundPointing() {
             if (experienceStarted) return;
             
-            // Simple detection - user clicks anywhere to start
+            console.log('Waiting for ground pointing...');
+            
+            // Multiple ways to start the experience
+            const startButton = document.getElementById('startInstructions');
+            
+            // Click/tap the instruction box itself
+            startButton.addEventListener('click', startExperience);
+            startButton.addEventListener('touchstart', startExperience);
+            startButton.style.cursor = 'pointer';
+            
+            // Also allow clicking anywhere on screen
             document.addEventListener('click', startExperience, { once: true });
             document.addEventListener('touchstart', startExperience, { once: true });
         }
@@ -307,9 +317,17 @@
             experienceStarted = true;
             console.log('Experience starting - camera pointed to ground');
             
-            // Hide start instructions
-            document.getElementById('startInstructions').style.display = 'none';
-            document.getElementById('instructions').style.display = 'block';
+            // Hide start instructions with fade out
+            const startInstructions = document.getElementById('startInstructions');
+            startInstructions.style.opacity = '0';
+            startInstructions.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                startInstructions.style.display = 'none';
+                // Show main instructions
+                document.getElementById('instructions').style.display = 'block';
+                document.getElementById('instructions').style.opacity = '1';
+            }, 500);
             
             // Show first green dot after delay
             setTimeout(() => {
