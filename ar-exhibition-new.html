@@ -490,9 +490,10 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion
+                // Start final elemental motion + enable manual rotation
                 setTimeout(() => {
                     memory.emit('finalMotion');
+                    enableManualRotation(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -510,6 +511,86 @@
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
                 }, 2000);
+            }
+        }
+
+        // Manual rotation for Geloras
+        function enableManualRotation(memory) {
+            let isRotating = false;
+            let startX = 0;
+            let currentRotationY = 0;
+            
+            // Store reference to automatic rotation
+            let autoRotationPaused = false;
+            
+            memory.addEventListener('mousedown', startRotation);
+            memory.addEventListener('touchstart', startRotation, { passive: false });
+            
+            function startRotation(e) {
+                isRotating = true;
+                
+                // Pause automatic rotation
+                const rotationAnim = memory.components['animation__wood-rotate360'] || 
+                                   memory.components['animation__fire-rotate360'] || 
+                                   memory.components['animation__metal-rotate360'] || 
+                                   memory.components['animation__water-rotate360'];
+                if (rotationAnim) {
+                    rotationAnim.pauseAnimation();
+                    autoRotationPaused = true;
+                }
+                
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                startX = clientX;
+                
+                // Get current rotation
+                const rotation = memory.getAttribute('rotation');
+                currentRotationY = rotation.y;
+                
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            document.addEventListener('mousemove', rotateGelora);
+            document.addEventListener('touchmove', rotateGelora, { passive: false });
+            
+            function rotateGelora(e) {
+                if (!isRotating) return;
+                
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+                const deltaX = clientX - startX;
+                
+                // Convert drag distance to rotation (adjust sensitivity)
+                const rotationSpeed = 0.5;
+                const newRotationY = currentRotationY + (deltaX * rotationSpeed);
+                
+                // Apply manual rotation while preserving other rotations
+                const currentRotation = memory.getAttribute('rotation');
+                memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                
+                e.preventDefault();
+            }
+            
+            document.addEventListener('mouseup', endRotation);
+            document.addEventListener('touchend', endRotation);
+            
+            function endRotation(e) {
+                if (!isRotating) return;
+                
+                isRotating = false;
+                
+                // Resume automatic rotation from current position
+                if (autoRotationPaused) {
+                    const rotationAnim = memory.components['animation__wood-rotate360'] || 
+                                       memory.components['animation__fire-rotate360'] || 
+                                       memory.components['animation__metal-rotate360'] || 
+                                       memory.components['animation__water-rotate360'];
+                    if (rotationAnim) {
+                        rotationAnim.resumeAnimation();
+                        autoRotationPaused = false;
+                    }
+                }
+                
+                e.preventDefault();
             }
         }
 
