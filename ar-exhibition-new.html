@@ -169,18 +169,18 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Drag glowing green dot to center target
+            Find 4 colored dots around screen edges - green one is flashing
         </div>
         
         <div class="awareness-counter" id="progress">
             <span id="count">0</span>/4
         </div>
         
-        <!-- All 4 dots visible from start - positioned in cardinal directions -->
-        <div class="glowing-dot dot-green active" id="dotGreen"></div>
-        <div class="glowing-dot dot-pink inactive" id="dotPink"></div>
-        <div class="glowing-dot dot-white inactive" id="dotWhite"></div>
-        <div class="glowing-dot dot-blue inactive" id="dotBlue"></div>
+        <!-- EMERGENCY FIX: All 4 dots with maximum visibility -->
+        <div class="glowing-dot dot-green active" id="dotGreen" style="display: block !important; opacity: 1 !important; visibility: visible !important;"></div>
+        <div class="glowing-dot dot-pink inactive" id="dotPink" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
+        <div class="glowing-dot dot-white inactive" id="dotWhite" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
+        <div class="glowing-dot dot-blue inactive" id="dotBlue" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
         
         <!-- Drag trail line -->
         <div class="drag-line" id="dragLine"></div>
