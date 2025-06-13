@@ -490,10 +490,10 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion + enable double-tap rotation
+                // Start final elemental motion + enable vertical dragging
                 setTimeout(() => {
                     memory.emit('finalMotion');
-                    enableDoubleTapRotation(memory);
+                    enableVerticalDragging(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -514,53 +514,71 @@
             }
         }
 
-        // Double-tap rotation for Geloras
-        function enableDoubleTapRotation(memory) {
-            let tapCount = 0;
-            let tapTimer = null;
-            let lastTapTime = 0;
+        // Vertical dragging for Geloras
+        function enableVerticalDragging(memory) {
+            let isDragging = false;
+            let startY = 0;
+            let startPosition = { x: 0, y: 0, z: 0 };
             
-            // Add cursor component to make it clickable
-            memory.setAttribute('cursor', 'rayOrigin: mouse');
+            // Add visual feedback - make it slightly larger when touched
+            memory.addEventListener('mousedown', startDrag);
+            memory.addEventListener('touchstart', startDrag, { passive: false });
             
-            // Use A-Frame's click event
-            memory.addEventListener('click', handleClick);
-            
-            function handleClick(e) {
-                const currentTime = Date.now();
+            function startDrag(e) {
+                isDragging = true;
                 
-                // Check if this is a double-tap (within 400ms of previous tap)
-                if (currentTime - lastTapTime < 400) {
-                    // Double-tap detected!
-                    rotateGelora90Degrees(memory);
-                    lastTapTime = 0; // Reset to prevent triple-tap
-                } else {
-                    // First tap
-                    lastTapTime = currentTime;
-                }
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                startY = clientY;
                 
+                // Get starting position
+                const position = memory.getAttribute('position');
+                startPosition = { x: position.x, y: position.y, z: position.z };
+                
+                // Visual feedback - slightly enlarge
+                const currentScale = memory.getAttribute('scale');
+                memory.setAttribute('scale', `${currentScale.x * 1.05} ${currentScale.y * 1.05} ${currentScale.z * 1.05}`);
+                
+                e.preventDefault();
                 e.stopPropagation();
             }
             
-            function rotateGelora90Degrees(memory) {
-                // Get current rotation
-                const currentRotation = memory.getAttribute('rotation');
-                const newRotationY = currentRotation.y + 90;
+            document.addEventListener('mousemove', dragVertically);
+            document.addEventListener('touchmove', dragVertically, { passive: false });
+            
+            function dragVertically(e) {
+                if (!isDragging) return;
                 
-                // Use A-Frame animation component
-                memory.setAttribute('animation__manual-rotate', {
-                    property: 'rotation',
-                    from: `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`,
-                    to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
-                    dur: 800,
-                    easing: 'easeInOutQuad'
-                });
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+                const deltaY = startY - clientY; // Invert so up drag moves up
                 
-                // Update rotation after animation
-                setTimeout(() => {
-                    memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
-                    memory.removeAttribute('animation__manual-rotate');
-                }, 800);
+                // Convert drag distance to world units (adjust sensitivity)
+                const sensitivity = 0.002;
+                const newY = startPosition.y + (deltaY * sensitivity);
+                
+                // Limit vertical movement range (prevent going too high or low)
+                const minY = startPosition.y - 1.0; // 1 unit below start
+                const maxY = startPosition.y + 1.5; // 1.5 units above start
+                const clampedY = Math.max(minY, Math.min(maxY, newY));
+                
+                // Update position
+                memory.setAttribute('position', `${startPosition.x} ${clampedY} ${startPosition.z}`);
+                
+                e.preventDefault();
+            }
+            
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+            
+            function endDrag(e) {
+                if (!isDragging) return;
+                
+                isDragging = false;
+                
+                // Return to normal scale
+                const currentScale = memory.getAttribute('scale');
+                memory.setAttribute('scale', `${currentScale.x / 1.05} ${currentScale.y / 1.05} ${currentScale.z / 1.05}`);
+                
+                e.preventDefault();
             }
         }
 
