@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Meditative AR Garden</title>
+    <title>Gelora Garden Discovery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -184,11 +184,11 @@
 
     <div class="overlay">
         <div class="zen-instructions" id="instructions">
-            Breathe deeply. Touch to plant each sculpture 🌱
+            Touch anywhere to plant your Gelora sculpture 🌱
         </div>
         
         <div class="position-guide" id="positionGuide">
-            East → South → West → North (secure positions)
+            Gelora sculptures grow exactly where you touch
         </div>
         
         <div class="progress-counter" id="progress">
@@ -209,7 +209,7 @@
         <div class="discovery-pulse pulse-north" id="pulseNorth"></div>
         
         <div class="completion-message" id="completionMessage">
-            ✨ Your meditation garden is complete ✨<br>
+            ✨ Your Gelora garden is complete ✨<br>
             <small>Breathe and observe • Shake to begin anew</small>
         </div>
     </div>
@@ -220,28 +220,28 @@
             {
                 id: 'east-artwork',
                 src: 'east-piece.glb',
-                name: 'Eastern Serenity',
+                name: 'Gelora Eastern Spirit',
                 color: 'green',
                 pulseId: 'pulseEast'
             },
             {
                 id: 'south-artwork',
                 src: 'south-piece.glb',
-                name: 'Southern Harmony',
+                name: 'Gelora Southern Harmony',
                 color: 'pink',
                 pulseId: 'pulseSouth'
             },
             {
                 id: 'west-artwork',
                 src: 'west-piece.glb',
-                name: 'Western Peace',
+                name: 'Gelora Western Peace',
                 color: 'white',
                 pulseId: 'pulseWest'
             },
             {
                 id: 'north-artwork',
                 src: 'north-piece.glb',
-                name: 'Northern Wisdom',
+                name: 'Gelora Northern Wisdom',
                 color: 'blue',
                 pulseId: 'pulseNorth'
             }
@@ -251,21 +251,32 @@
         let growthCount = 0;
         const grownSculptures = new Set();
 
-        // Convert screen coordinates to secure 3D world positions
-        function screenToWorld(screenX, screenY, artworkIndex) {
+        // Convert screen coordinates to exact tap position in 3D world
+        function screenToWorld(screenX, screenY) {
             const camera = document.querySelector('[camera]');
             const canvas = document.querySelector('a-scene').canvas;
             
-            // Predefined secure positions to prevent overlapping
-            const securePositions = [
-                { x: 1.2, y: -0.5, z: -1.8 },   // East - right side
-                { x: 0, y: -0.5, z: -1.0 },     // South - front center
-                { x: -1.2, y: -0.5, z: -1.8 },  // West - left side  
-                { x: 0, y: -0.5, z: -2.5 }      // North - back center
-            ];
+            // Normalize screen coordinates (-1 to 1)
+            const x = (screenX / canvas.clientWidth) * 2 - 1;
+            const y = -(screenY / canvas.clientHeight) * 2 + 1;
             
-            // Return secure position based on artwork sequence
-            return securePositions[artworkIndex] || securePositions[0];
+            // Project ray from camera to ground plane
+            const cameraPos = camera.object3D.position;
+            const cameraRot = camera.object3D.rotation;
+            
+            // Calculate ground intersection (Y = -0.5)
+            const groundY = -0.5;
+            const rayLength = Math.abs((cameraPos.y - groundY) / Math.sin(cameraRot.x || -0.2));
+            
+            // Calculate world position where tap occurred
+            const worldX = cameraPos.x + (x * rayLength * 0.4);
+            const worldZ = cameraPos.z - (rayLength * 0.9);
+            
+            return {
+                x: Math.max(-3, Math.min(3, worldX)),
+                y: groundY,
+                z: Math.max(-4, Math.min(-0.3, worldZ))
+            };
         }
 
         // Meditative tap handler
@@ -273,12 +284,12 @@
             if (currentArtworkIndex >= artworkSequence.length) return;
 
             const currentArtwork = artworkSequence[currentArtworkIndex];
-            const tapPosition = screenToWorld(event.clientX, event.clientY, currentArtworkIndex);
+            const tapPosition = screenToWorld(event.clientX, event.clientY);
             
             // Show colored discovery pulse at tap location
             showColoredPulse(currentArtwork.pulseId, event.clientX, event.clientY);
             
-            // Create and grow sculpture at secure position
+            // Create and grow sculpture at exact tap location
             createAndGrowSculpture(currentArtwork, tapPosition);
             
             currentArtworkIndex++;
@@ -316,47 +327,47 @@
             sculpture.setAttribute('scale', '0 0 0');
             sculpture.setAttribute('visible', false);
             
-            // Add very slow, meditative growth animations
+            // Add ultra-slow, deeply meditative growth animations
             sculpture.setAttribute('animation__emerge', 
                 'property: position; ' +
-                `from: ${position.x} ${position.y - 1.0} ${position.z}; ` +
+                `from: ${position.x} ${position.y - 1.2} ${position.z}; ` +
                 `to: ${position.x} ${position.y + 0.05} ${position.z}; ` +
-                'dur: 25000; easing: easeOutQuart; startEvents: emerge'
+                'dur: 50000; easing: easeOutQuart; startEvents: emerge'
             );
             
             sculpture.setAttribute('animation__grow', 
                 'property: scale; from: 0 0 0; to: 0.8 0.8 0.8; ' +
-                'dur: 30000; easing: easeOutElastic; startEvents: grow'
+                'dur: 60000; easing: easeOutElastic; startEvents: grow'
             );
             
             sculpture.setAttribute('animation__breathe', 
                 `property: position; from: ${position.x} ${position.y + 0.05} ${position.z}; ` +
                 `to: ${position.x} ${position.y + 0.08} ${position.z}; ` +
-                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: breathe'
+                'dir: alternate; dur: 24000; easing: easeInOutSine; loop: true; startEvents: breathe'
             );
             
             sculpture.setAttribute('animation__gentle-turn', 
                 'property: rotation; to: 0 15 0; ' +
-                'dur: 120000; easing: easeInOutSine; startEvents: turn'
+                'dur: 240000; easing: easeInOutSine; startEvents: turn'
             );
             
             container.appendChild(sculpture);
             
-            // Load and show with extra slow meditation timing
+            // Load and show with ultra-slow deep meditation timing
             sculpture.addEventListener('model-loaded', function() {
                 setTimeout(() => {
                     sculpture.setAttribute('visible', true);
                     sculpture.emit('emerge');
-                }, 500);
+                }, 800);
                 
                 setTimeout(() => {
                     sculpture.emit('grow');
-                }, 1000);
+                }, 1500);
                 
                 setTimeout(() => {
                     sculpture.emit('breathe');
                     sculpture.emit('turn');
-                }, 15000);
+                }, 30000);
             });
             
             sculpture.addEventListener('model-error', function() {
@@ -385,17 +396,17 @@
             const instructions = document.getElementById('instructions');
             const positionGuide = document.getElementById('positionGuide');
             const messages = [
-                "Breathe deeply. Touch to plant each sculpture 🌱",
-                "Feel the growth. Three more await your touch 🌿",
-                "Center yourself. Two sculptures remain 🌸",
-                "Almost complete. One final planting 🌺"
+                "Touch anywhere to plant your Gelora sculpture 🌱",
+                "Feel the slow growth. Three more Gelora pieces await 🌿",
+                "Breathe deeply. Two Gelora sculptures remain 🌸",
+                "One final touch to complete your Gelora garden 🌺"
             ];
             
             const guides = [
-                "East → South → West → North (secure positions)",
-                "Next: Southern position (front center)",
-                "Next: Western position (left side)",
-                "Final: Northern position (back center)"
+                "Gelora sculptures grow exactly where you touch",
+                "Each Gelora piece takes 1 minute to fully emerge",
+                "Watch the gentle, meditative Gelora growth",
+                "Final Gelora sculpture will bloom slowly"
             ];
             
             if (growthCount < messages.length) {
@@ -470,8 +481,8 @@
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
             document.getElementById('tapHint').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Breathe deeply. Touch to plant each sculpture 🌱';
-            document.getElementById('positionGuide').innerHTML = 'East → South → West → North (secure positions)';
+            document.getElementById('instructions').innerHTML = 'Touch anywhere to plant your Gelora sculpture 🌱';
+            document.getElementById('positionGuide').innerHTML = 'Gelora sculptures grow exactly where you touch';
             document.getElementById('completionMessage').style.display = 'none';
         }
 
