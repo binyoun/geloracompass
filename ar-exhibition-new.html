@@ -469,6 +469,9 @@
             container.appendChild(memory);
             
             memory.addEventListener('model-loaded', function() {
+                // Enable interaction immediately when model loads
+                enableGeloraInteraction(memory);
+                
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('emergeAtCenter');
@@ -490,10 +493,9 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion + enable interaction
+                // Start final elemental motion
                 setTimeout(() => {
                     memory.emit('finalMotion');
-                    enableGeloraInteraction(memory);
                 }, emergeDuration + 9000);
             });
             
