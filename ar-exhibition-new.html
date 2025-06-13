@@ -169,7 +169,7 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Look for bright green dot at bottom
+            Drag green dot upward to center target
         </div>
         
         <div class="awareness-counter" id="progress">
@@ -330,21 +330,17 @@
             let startPos = { x: 0, y: 0 };
             let startDotPos = { x: 0, y: 0 };
             
-            // Mouse events
-            dotElement.addEventListener('mousedown', startDrag);
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', endDrag);
-            
-            // Touch events
-            dotElement.addEventListener('touchstart', startDrag, { passive: false });
-            document.addEventListener('touchmove', drag, { passive: false });
-            document.addEventListener('touchend', endDrag);
-            
             function startDrag(e) {
-                if (memoryConfig.order !== currentAvailableDot || draggedDots.has(dotElement.id)) return;
+                // Check if this is the current available dot
+                if (memoryConfig.order !== currentAvailableDot || draggedDots.has(dotElement.id)) {
+                    console.log('Drag blocked - not current dot or already dragged');
+                    return;
+                }
                 
+                console.log('Starting drag for:', dotElement.id);
                 isDragging = true;
-                dotElement.style.zIndex = '1001';
+                dotElement.style.zIndex = '10000 !important';
+                dotElement.style.cursor = 'grabbing';
                 
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
@@ -358,63 +354,85 @@
                 startDotPos.y = rect.top + rect.height / 2;
                 
                 e.preventDefault();
+                e.stopPropagation();
             }
             
             function drag(e) {
                 if (!isDragging) return;
                 
+                console.log('Dragging...');
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 
                 const newX = clientX - startPos.x;
                 const newY = clientY - startPos.y;
                 
-                dotElement.style.left = newX + 'px';
-                dotElement.style.top = newY + 'px';
-                dotElement.style.position = 'fixed';
-                dotElement.style.transform = 'none';
+                // Force position update
+                dotElement.style.position = 'fixed !important';
+                dotElement.style.left = newX + 'px !important';
+                dotElement.style.top = newY + 'px !important';
+                dotElement.style.transform = 'none !important';
+                dotElement.style.bottom = 'auto !important';
                 
                 // Create drag line from start position to current position
                 const currentDotX = clientX;
                 const currentDotY = clientY;
                 
                 // Get dot color for line
-                const color = dotElement.style.color || 
-                    (memoryConfig.color === 'green' ? 'rgba(0,255,127,1)' :
-                     memoryConfig.color === 'pink' ? 'rgba(255,20,147,1)' :
-                     memoryConfig.color === 'white' ? 'rgba(255,255,255,1)' :
-                     'rgba(173,216,230,1)');
+                const color = memoryConfig.color === 'green' ? 'rgba(0,255,127,1)' :
+                             memoryConfig.color === 'pink' ? 'rgba(255,20,147,1)' :
+                             memoryConfig.color === 'white' ? 'rgba(255,255,255,1)' :
+                             'rgba(173,216,230,1)';
                 
                 createDragLine(startDotPos.x, startDotPos.y, currentDotX, currentDotY, color);
                 
                 e.preventDefault();
+                e.stopPropagation();
             }
             
             function endDrag(e) {
                 if (!isDragging) return;
                 
+                console.log('Ending drag');
                 isDragging = false;
-                dotElement.style.zIndex = '1000';
+                dotElement.style.cursor = 'grab';
                 hideDragLine();
                 
                 // Check if dot reached center target
                 if (isInCenter(dotElement)) {
+                    console.log('Dot reached center!');
                     draggedDots.add(dotElement.id);
                     awakenGroundMemory(memoryConfig);
                     hideDot(dotElement);
                     currentAvailableDot++; // Move to next dot
                     setTimeout(() => showCurrentDot(), 500); // Show next dot after brief delay
                 } else {
+                    console.log('Dot not in center, resetting position');
                     // Reset position if not successful
-                    dotElement.style.position = 'absolute';
-                    dotElement.style.left = '50%';
-                    dotElement.style.bottom = '10%';
-                    dotElement.style.top = 'auto';
-                    dotElement.style.transform = 'translateX(-50%)';
+                    dotElement.style.position = 'fixed !important';
+                    dotElement.style.left = '50% !important';
+                    dotElement.style.bottom = '8% !important';
+                    dotElement.style.top = 'auto !important';
+                    dotElement.style.transform = 'translateX(-50%) !important';
                 }
                 
                 e.preventDefault();
+                e.stopPropagation();
             }
+            
+            // Remove any existing event listeners first
+            dotElement.removeEventListener('mousedown', startDrag);
+            dotElement.removeEventListener('touchstart', startDrag);
+            
+            // Add event listeners
+            dotElement.addEventListener('mousedown', startDrag, { passive: false });
+            dotElement.addEventListener('touchstart', startDrag, { passive: false });
+            
+            // Add global move and end listeners
+            document.addEventListener('mousemove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag, { passive: false });
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag, { passive: false });
         }
         
         function hideDot(dotElement) {
