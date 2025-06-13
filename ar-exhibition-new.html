@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Directional Awakening</title>
+    <title>Gelora - Ground First Discovery</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -24,6 +24,23 @@
             z-index: 999;
         }
         
+        .start-instructions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 30px 40px;
+            border-radius: 30px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 300;
+            max-width: 80%;
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+        }
+        
         .ground-instructions {
             position: absolute;
             top: 30px;
@@ -37,6 +54,7 @@
             font-size: 10px;
             backdrop-filter: blur(3px);
             font-weight: 300;
+            display: none;
         }
         
         .awareness-counter {
@@ -168,19 +186,24 @@
     </a-scene>
 
     <div class="overlay">
+        <div class="start-instructions" id="startInstructions">
+            Point your camera toward the ground first<br>
+            <small style="margin-top: 10px; display: block; opacity: 0.8;">Then the experience will begin...</small>
+        </div>
+        
         <div class="ground-instructions" id="instructions">
-            Look around screen edges - green dot flashing on right
+            Drag green dot to center target
         </div>
         
         <div class="awareness-counter" id="progress">
             <span id="count">0</span>/4
         </div>
         
-        <!-- EMERGENCY FIX: All 4 dots with maximum visibility -->
-        <div class="glowing-dot dot-green active" id="dotGreen" style="display: block !important; opacity: 1 !important; visibility: visible !important;"></div>
-        <div class="glowing-dot dot-pink inactive" id="dotPink" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
-        <div class="glowing-dot dot-white inactive" id="dotWhite" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
-        <div class="glowing-dot dot-blue inactive" id="dotBlue" style="display: block !important; opacity: 0.6 !important; visibility: visible !important;"></div>
+        <!-- SEQUENTIAL DOTS - All hidden initially -->
+        <div class="glowing-dot dot-green" id="dotGreen"></div>
+        <div class="glowing-dot dot-pink" id="dotPink"></div>
+        <div class="glowing-dot dot-white" id="dotWhite"></div>
+        <div class="glowing-dot dot-blue" id="dotBlue"></div>
         
         <!-- Drag trail line -->
         <div class="drag-line" id="dragLine"></div>
@@ -238,7 +261,9 @@
         let groundCount = 0;
         const awakenedMemories = new Set();
         let draggedDots = new Set();
-        let currentAvailableDot = 0; // Track which dot should be available
+        let currentAvailableDot = 0;
+        let experienceStarted = false;
+        let groundCameraDetected = false; // Track which dot should be available
         
         // Get center target position
         function getCenterPosition() {
@@ -267,27 +292,69 @@
             return distance < 40; // Within 40px of center target
         }
 
-        // FIXED: Show all dots but activate sequentially
-        function updateDotStates() {
-            console.log('Updating dot states, current index:', currentAvailableDot);
+        // Detect when camera is pointing toward ground
+        function detectGroundPointing() {
+            if (experienceStarted) return;
             
-            groundMemories.forEach((memory, index) => {
-                const dot = document.getElementById(memory.dotId);
-                
-                if (index === currentAvailableDot) {
-                    // Current active dot
-                    dot.className = dot.className.replace('inactive', 'active');
-                    dot.style.pointerEvents = 'all !important';
-                    console.log('Activated dot:', memory.dotId);
-                } else if (index < currentAvailableDot) {
-                    // Already completed dots - hide them
-                    dot.style.display = 'none !important';
-                } else {
-                    // Future dots - show but inactive
-                    dot.className = dot.className.replace('active', 'inactive');
-                    dot.style.pointerEvents = 'none !important';
-                }
-            });
+            // Simple detection - user clicks anywhere to start
+            document.addEventListener('click', startExperience, { once: true });
+            document.addEventListener('touchstart', startExperience, { once: true });
+        }
+        
+        function startExperience() {
+            if (experienceStarted) return;
+            
+            experienceStarted = true;
+            console.log('Experience starting - camera pointed to ground');
+            
+            // Hide start instructions
+            document.getElementById('startInstructions').style.display = 'none';
+            document.getElementById('instructions').style.display = 'block';
+            
+            // Show first green dot after delay
+            setTimeout(() => {
+                showCurrentDot();
+            }, 1000);
+        }
+        
+        // Show only current dot sequentially
+        function showCurrentDot() {
+            if (currentAvailableDot >= groundMemories.length) return;
+            
+            const currentMemory = groundMemories[currentAvailableDot];
+            const currentDot = document.getElementById(currentMemory.dotId);
+            
+            console.log('Showing dot:', currentMemory.dotId);
+            
+            // Make current dot visible with animation
+            currentDot.classList.add('visible');
+            currentDot.style.pointerEvents = 'all';
+            
+            // Update instruction
+            const colorNames = {
+                'green': 'green',
+                'pink': 'pink',
+                'white': 'white', 
+                'blue': 'blue'
+            };
+            document.getElementById('instructions').innerHTML = 
+                `Drag ${colorNames[currentMemory.color]} dot to center target`;
+        }
+        
+        // Hide current dot after successful drag
+        function hideCurrentDot() {
+            if (currentAvailableDot >= groundMemories.length) return;
+            
+            const currentMemory = groundMemories[currentAvailableDot - 1]; // Previous dot
+            const currentDot = document.getElementById(currentMemory.dotId);
+            
+            // Hide the dot with animation
+            currentDot.classList.remove('visible');
+            currentDot.style.pointerEvents = 'none';
+            
+            setTimeout(() => {
+                currentDot.style.display = 'none';
+            }, 500);
         }
 
         // Create drag trail line
@@ -391,9 +458,15 @@
                     console.log('Dot reached center!');
                     draggedDots.add(dotElement.id);
                     awakenGroundMemory(memoryConfig);
-                    hideDot(dotElement);
+                    hideCurrentDot(); // Hide current dot
                     currentAvailableDot++; // Move to next dot
-                    setTimeout(() => updateDotStates(), 500); // Update dot states
+                    
+                    // Show next dot after 3D piece emerges
+                    setTimeout(() => {
+                        if (currentAvailableDot < groundMemories.length) {
+                            showCurrentDot();
+                        }
+                    }, 3000); // Wait for 3D emergence
                 } else {
                     console.log('Dot not in center, resetting position');
                     // Reset position if not successful
@@ -573,10 +646,10 @@
             }
         }
 
-        // Initialize dot states - show all dots, activate first one
-        updateDotStates();
+        // Initialize ground detection
+        detectGroundPointing();
         
-        // Initialize draggable dots
+        // Initialize draggable dots (all hidden initially)
         groundMemories.forEach(memory => {
             const dot = document.getElementById(memory.dotId);
             makeDraggable(dot, memory);
