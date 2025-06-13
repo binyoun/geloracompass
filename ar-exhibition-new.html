@@ -187,41 +187,46 @@
     </div>
 
     <script>
-        // Ground awareness configuration
+        // Ground awareness configuration with sequential dot placement
         const groundMemories = [
             {
                 id: 'east-ground',
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.0, y: -0.5, z: -2.0 }
+                position: { x: 2.0, y: -0.5, z: -2.0 },
+                order: 0
             },
             {
                 id: 'south-ground',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.6,  // Reduced scale for south piece
-                position: { x: 0.0, y: -0.5, z: -1.0 }
+                position: { x: 0.0, y: -0.5, z: -1.0 },
+                order: 1
             },
             {
                 id: 'west-ground',
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.0, y: -0.5, z: -2.0 }
+                position: { x: -2.0, y: -0.5, z: -2.0 },
+                order: 2
             },
             {
                 id: 'north-ground',
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 0.0, y: -0.5, z: -3.0 }
+                position: { x: 0.0, y: -0.5, z: -3.5 }, // Moved further back to be more visible
+                order: 3
             }
         ];
 
         let groundCount = 0;
         const awakenedMemories = new Set();
         let draggedDots = new Set();
+        let currentAvailableDot = 0; // Track which dot should be available
         
         // Get center target position
         function getCenterPosition() {
@@ -256,6 +261,21 @@
             let startPos = { x: 0, y: 0 };
             let currentPos = { x: 0, y: 0 };
             
+            // Only make draggable if it's the current available dot
+            function checkAvailability() {
+                if (memoryConfig.order !== currentAvailableDot) {
+                    dotElement.style.opacity = '0.3';
+                    dotElement.style.pointerEvents = 'none';
+                    return false;
+                }
+                dotElement.style.opacity = '0.8';
+                dotElement.style.pointerEvents = 'all';
+                return true;
+            }
+            
+            // Initial availability check
+            checkAvailability();
+            
             // Mouse events
             dotElement.addEventListener('mousedown', startDrag);
             document.addEventListener('mousemove', drag);
@@ -267,7 +287,7 @@
             document.addEventListener('touchend', endDrag);
             
             function startDrag(e) {
-                if (draggedDots.has(dotElement.id)) return;
+                if (!checkAvailability() || draggedDots.has(dotElement.id)) return;
                 
                 isDragging = true;
                 dotElement.style.zIndex = '1000';
@@ -309,10 +329,24 @@
                     draggedDots.add(dotElement.id);
                     awakenGroundMemory(memoryConfig);
                     hideDot(dotElement);
+                    currentAvailableDot++; // Enable next dot
+                    updateDotAvailability(); // Update all dots
                 }
                 
                 e.preventDefault();
             }
+            
+            // Store reference for later availability updates
+            dotElement.checkAvailability = checkAvailability;
+        }
+        
+        function updateDotAvailability() {
+            groundMemories.forEach(memory => {
+                const dot = document.getElementById(memory.dotId);
+                if (dot.checkAvailability) {
+                    dot.checkAvailability();
+                }
+            });
         }
         
         function hideDot(dotElement) {
@@ -326,71 +360,86 @@
         function awakenGroundMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create ground memory element starting at center
+            // Create ground memory element starting at center, truly underground
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', '0 -0.8 -1.5'); // Start at center underground
-            memory.setAttribute('scale', '0 0 0');
+            memory.setAttribute('position', '0 -2.0 -1.5'); // Start deep underground at center
+            memory.setAttribute('scale', '0.1 0.1 0.1'); // Start very small
+            memory.setAttribute('rotation', '0 0 0');
             memory.setAttribute('visible', false);
             
-            // Center emergence animation - emerge from center first
-            memory.setAttribute('animation__center-emerge', 
-                'property: position; from: 0 -1.2 -1.5; to: 0 0.1 -1.5; ' +
-                'dur: 15000; easing: easeOutQuart; startEvents: centerEmerge'
+            // True center ground emergence - slow rise from deep underground
+            memory.setAttribute('animation__ground-emerge', 
+                'property: position; from: 0 -2.0 -1.5; to: 0 0.2 -1.5; ' +
+                'dur: 12000; easing: easeOutQuart; startEvents: groundEmerge'
             );
             
-            // Growing motion while at center
-            memory.setAttribute('animation__center-grow', 
-                `property: scale; from: 0 0 0; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 18000; easing: easeOutElastic; startEvents: centerGrow'
+            // Scale growth while emerging - dramatic size change
+            memory.setAttribute('animation__scale-grow', 
+                `property: scale; from: 0.1 0.1 0.1; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
+                'dur: 10000; easing: easeOutElastic; startEvents: scaleGrow'
             );
             
-            // Movement to final position after emerging at center
+            // Faster swirling rotation while emerging
+            memory.setAttribute('animation__swirl-emerge', 
+                'property: rotation; from: 0 0 0; to: 0 1080 0; ' +
+                'dur: 8000; easing: easeOutQuart; startEvents: swirlEmerge'
+            );
+            
+            // Movement to final position after center emergence
             memory.setAttribute('animation__move-to-position', 
                 'property: position; ' +
-                `from: 0 0.1 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
-                'dur: 12000; easing: easeInOutQuart; startEvents: moveToPosition'
+                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.2} ${memoryConfig.position.z}; ` +
+                'dur: 8000; easing: easeInOutQuart; startEvents: moveToPosition'
+            );
+            
+            // Continue rotation during movement
+            memory.setAttribute('animation__move-rotate', 
+                'property: rotation; from: 0 1080 0; to: 0 1440 0; ' +
+                'dur: 8000; easing: easeInOutQuart; startEvents: moveRotate'
             );
             
             // Gentle life breathing at final position
             memory.setAttribute('animation__final-breathe', 
-                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
-                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.18} ${memoryConfig.position.z}; ` +
-                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: finalBreathe'
+                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.2} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.3} ${memoryConfig.position.z}; ` +
+                'dir: alternate; dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalBreathe'
             );
             
-            // Slow turning for 360° view at final position
+            // Continuous gentle rotation for 360° view at final position
             memory.setAttribute('animation__final-turn', 
-                'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                'dur: 180000; easing: linear; loop: true; startEvents: finalTurn'
+                'property: rotation; from: 0 1440 0; to: 0 1800 0; ' +
+                'dur: 120000; easing: linear; loop: true; startEvents: finalTurn'
             );
             
             container.appendChild(memory);
             
-            // Load and show with center-first timing sequence
+            // Load and show with proper center-ground emergence sequence
             memory.addEventListener('model-loaded', function() {
-                // 1. Start at center underground
+                // 1. Start deep underground at center
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
-                    memory.emit('centerEmerge');
+                    memory.emit('groundEmerge');
+                    memory.emit('scaleGrow'); 
+                    memory.emit('swirlEmerge');
                 }, 500);
                 
-                // 2. Grow while emerging at center
-                setTimeout(() => {
-                    memory.emit('centerGrow');
-                }, 1000);
-                
-                // 3. Move to final position after center emergence
+                // 2. Move to final position after center emergence
                 setTimeout(() => {
                     memory.emit('moveToPosition');
-                }, 16000); // After center emergence completes
+                    memory.emit('moveRotate');
+                }, 12500); // After ground emergence completes
                 
-                // 4. Start life motions at final position
+                // 3. Start life motions at final position
                 setTimeout(() => {
                     memory.emit('finalBreathe');
                     memory.emit('finalTurn');
-                }, 28000); // After movement completes
+                }, 20500); // After movement completes
+            });
+            
+            memory.addEventListener('model-error', function() {
+                console.log(`Failed to awaken ${memoryConfig.id} from ground`);
             });
             
             awakenedMemories.add(memoryConfig.id);
@@ -408,6 +457,19 @@
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
                 }, 2000);
+            } else {
+                // Update instruction for next piece
+                const nextPiece = groundMemories[currentAvailableDot];
+                if (nextPiece) {
+                    const colorNames = {
+                        'dotGreen': 'green',
+                        'dotPink': 'pink', 
+                        'dotWhite': 'white',
+                        'dotBlue': 'blue'
+                    };
+                    const nextColor = colorNames[nextPiece.dotId];
+                    document.getElementById('instructions').innerHTML = `Drag ${nextColor} dot to center`;
+                }
             }
         }
 
@@ -477,12 +539,13 @@
             container.innerHTML = '';
             
             groundCount = 0;
+            currentAvailableDot = 0; // Reset to first dot
             awakenedMemories.clear();
             draggedDots.clear();
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Drag glowing dots to center';
+            document.getElementById('instructions').innerHTML = 'Drag green dot to center';
             document.getElementById('centerTarget').style.display = 'block';
             document.getElementById('groundComplete').style.display = 'none';
             
@@ -490,10 +553,21 @@
             groundMemories.forEach(memory => {
                 const dot = document.getElementById(memory.dotId);
                 dot.style.display = 'block';
-                dot.style.opacity = '0.8';
                 dot.style.pointerEvents = 'all';
                 dot.style.position = 'absolute';
                 dot.style.zIndex = '999';
+                
+                // Reset to original positions
+                dot.style.left = '';
+                dot.style.top = '';
+                
+                // Only first dot available initially
+                if (memory.order === 0) {
+                    dot.style.opacity = '0.8';
+                } else {
+                    dot.style.opacity = '0.3';
+                    dot.style.pointerEvents = 'none';
+                }
             });
         }
 
