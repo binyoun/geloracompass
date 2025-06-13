@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora -7 Ground Awareness</title>
+    <title>Gelora - Ground Awareness</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -332,57 +332,57 @@
         function awakenGroundMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create ground memory element starting deep underground at center
+            // Create ground memory element starting at the center circle position
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            // Start deep underground at center for dramatic emergence
-            memory.setAttribute('position', '0 -1.5 -1.5'); 
+            // Start exactly at center circle position (0, 0, -1.5 corresponds to center circle)
+            memory.setAttribute('position', '0 -1.0 -1.5'); 
             memory.setAttribute('scale', '0.01 0.01 0.01'); // Start as tiny piece
             memory.setAttribute('visible', false);
             
-            // Dramatic emergence from deep underground
-            memory.setAttribute('animation__emerge-from-bottom', 
-                'property: position; from: 0 -1.5 -1.5; to: 0 0.5 -1.5; ' +
-                'dur: 4000; easing: easeOutQuart; startEvents: emergeFromBottom'
+            // Emerge from center circle underground to center circle surface
+            memory.setAttribute('animation__emerge-at-center', 
+                'property: position; from: 0 -1.0 -1.5; to: 0 0.2 -1.5; ' +
+                'dur: 3000; easing: easeOutQuart; startEvents: emergeAtCenter'
             );
             
-            // Slow growth from tiny to human size during emergence
-            memory.setAttribute('animation__grow-to-human', 
+            // Grow from tiny to human size while at center
+            memory.setAttribute('animation__grow-at-center', 
                 `property: scale; from: 0.01 0.01 0.01; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 6000; easing: easeOutElastic; startEvents: growToHuman'
+                'dur: 4000; easing: easeOutElastic; startEvents: growAtCenter'
             );
             
-            // Gentle swirling while growing and emerging
-            memory.setAttribute('animation__growth-swirl', 
+            // Gentle swirling while growing at center
+            memory.setAttribute('animation__center-swirl', 
                 'property: rotation; from: 0 0 0; to: 0 720 0; ' +
-                'dur: 6000; easing: easeInOutSine; startEvents: growthSwirl'
+                'dur: 4000; easing: easeInOutSine; startEvents: centerSwirl'
             );
             
-            // Float to final position with graceful movement
-            memory.setAttribute('animation__float-to-position', 
+            // Move from center to final position after growing
+            memory.setAttribute('animation__move-to-final-position', 
                 'property: position; ' +
-                `from: 0 0.5 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
-                'dur: 5000; easing: easeInOutQuart; startEvents: floatToPosition'
+                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
+                'dur: 4000; easing: easeInOutQuart; startEvents: moveToFinalPosition'
             );
             
-            // Enhanced floating motion when settled
+            // Enhanced floating motion when settled at final position
             memory.setAttribute('animation__final-float', 
                 `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
                 `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.7} ${memoryConfig.position.z}; ` +
                 'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalFloat'
             );
             
-            // MUCH FASTER swirling when floating - 3x faster
+            // SUPER FAST swirling - 3x faster than before (was 10s, now 3.3s)
             memory.setAttribute('animation__final-swirl', 
                 'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                'dur: 10000; easing: linear; loop: true; startEvents: finalSwirl'
+                'dur: 3300; easing: linear; loop: true; startEvents: finalSwirl'
             );
             
-            // Additional rapid spinning for dynamic effect
+            // ULTRA RAPID spinning - 3x faster (was 8s, now 2.7s)
             memory.setAttribute('animation__rapid-spin', 
                 'property: rotation; from: 0 0 0; to: 0 720 0; ' +
-                'dur: 8000; easing: linear; loop: true; startEvents: rapidSpin'
+                'dur: 2700; easing: linear; loop: true; startEvents: rapidSpin'
             );
             
             // Pulsing scale for breathing effect
@@ -390,18 +390,6 @@
                 `property: scale; from: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
                 `to: ${memoryConfig.scale * 1.15} ${memoryConfig.scale * 1.15} ${memoryConfig.scale * 1.15}; ` +
                 'dir: alternate; dur: 3000; easing: easeInOutSine; loop: true; startEvents: finalPulse'
-            );
-            
-            // Dynamic tilting for better viewing while floating
-            memory.setAttribute('animation__final-tilt', 
-                'property: rotation; from: -12 0 -12; to: 12 0 12; ' +
-                'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalTilt'
-            );
-            
-            // Fast wobbling motion for more dynamic life
-            memory.setAttribute('animation__final-wobble', 
-                'property: rotation; from: 0 0 -6; to: 0 0 6; ' +
-                'dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; startEvents: finalWobble'
             );
             
             // Orbital movement for even more dynamic floating
@@ -413,35 +401,33 @@
             
             container.appendChild(memory);
             
-            // Immediate dramatic emergence sequence
+            // Perfect sequence: emerge at center, grow at center, then move to position
             memory.addEventListener('model-loaded', function() {
-                // 1. Immediately show and start dramatic emergence from deep underground
+                // 1. Immediately show and emerge at center circle
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
-                    memory.emit('emergeFromBottom');
+                    memory.emit('emergeAtCenter');
                 }, 100);
                 
-                // 2. Start growing while emerging
+                // 2. Start growing and swirling while at center
                 setTimeout(() => {
-                    memory.emit('growToHuman');
-                    memory.emit('growthSwirl');
+                    memory.emit('growAtCenter');
+                    memory.emit('centerSwirl');
                 }, 500);
                 
-                // 3. Float to final position after emerging above ground
+                // 3. Move to final position after fully grown at center
                 setTimeout(() => {
-                    memory.emit('floatToPosition');
+                    memory.emit('moveToFinalPosition');
                 }, 4500);
                 
-                // 4. Start all enhanced floating motions with fast swirling
+                // 4. Start ultra-fast floating motions at final position
                 setTimeout(() => {
                     memory.emit('finalFloat');
                     memory.emit('finalSwirl');
                     memory.emit('rapidSpin');
                     memory.emit('finalPulse');
-                    memory.emit('finalTilt');
-                    memory.emit('finalWobble');
                     memory.emit('orbitalFloat');
-                }, 9500);
+                }, 8500);
             });
             
             awakenedMemories.add(memoryConfig.id);
