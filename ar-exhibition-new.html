@@ -39,6 +39,18 @@
             max-width: 80%;
             backdrop-filter: blur(10px);
             z-index: 10000;
+            pointer-events: all !important;
+            cursor: pointer !important;
+            user-select: none;
+        }
+        
+        .start-instructions:hover {
+            background: rgba(0,0,0,0.9);
+            transform: translate(-50%, -50%) scale(1.05);
+        }
+        
+        .start-instructions:active {
+            transform: translate(-50%, -50%) scale(0.95);
         }
         
         .ground-instructions {
@@ -292,23 +304,34 @@
             return distance < 40; // Within 40px of center target
         }
 
-        // Detect when camera is pointing toward ground - better detection
+        // FIXED: Simple and reliable tap detection
         function detectGroundPointing() {
             if (experienceStarted) return;
             
-            console.log('Waiting for ground pointing...');
+            console.log('Setting up tap detection...');
             
-            // Multiple ways to start the experience
             const startButton = document.getElementById('startInstructions');
             
-            // Click/tap the instruction box itself
-            startButton.addEventListener('click', startExperience);
-            startButton.addEventListener('touchstart', startExperience);
-            startButton.style.cursor = 'pointer';
+            // Multiple event types for maximum compatibility
+            function tryStart(e) {
+                console.log('Tap detected!', e.type);
+                e.preventDefault();
+                e.stopPropagation();
+                startExperience();
+            }
             
-            // Also allow clicking anywhere on screen
-            document.addEventListener('click', startExperience, { once: true });
-            document.addEventListener('touchstart', startExperience, { once: true });
+            // Add all possible events
+            startButton.addEventListener('click', tryStart, { passive: false });
+            startButton.addEventListener('touchstart', tryStart, { passive: false });
+            startButton.addEventListener('touchend', tryStart, { passive: false });
+            startButton.addEventListener('mousedown', tryStart, { passive: false });
+            startButton.addEventListener('mouseup', tryStart, { passive: false });
+            
+            // Backup: global tap anywhere
+            setTimeout(() => {
+                document.addEventListener('click', tryStart, { passive: false, once: true });
+                document.addEventListener('touchstart', tryStart, { passive: false, once: true });
+            }, 100);
         }
         
         function startExperience() {
