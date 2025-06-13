@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Ground Awareness</title>
+    <title>Gelora - Awakening Small Things</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -169,18 +169,18 @@
 
     <div class="overlay">
         <div class="ground-instructions" id="instructions">
-            Drag dot upward to center
+            Look for bright green dot at bottom
         </div>
         
         <div class="awareness-counter" id="progress">
             <span id="count">0</span>/4
         </div>
         
-        <!-- Pre-positioned glowing dots - only first one visible initially -->
-        <div class="glowing-dot dot-green" id="dotGreen"></div>
-        <div class="glowing-dot dot-pink" id="dotPink" style="display: none;"></div>
-        <div class="glowing-dot dot-white" id="dotWhite" style="display: none;"></div>
-        <div class="glowing-dot dot-blue" id="dotBlue" style="display: none;"></div>
+        <!-- FIXED: Dots with forced visibility - only first one shown initially -->
+        <div class="glowing-dot dot-green" id="dotGreen" style="display: block !important; opacity: 1 !important; visibility: visible !important;"></div>
+        <div class="glowing-dot dot-pink" id="dotPink" style="display: none !important;"></div>
+        <div class="glowing-dot dot-white" id="dotWhite" style="display: none !important;"></div>
+        <div class="glowing-dot dot-blue" id="dotBlue" style="display: none !important;"></div>
         
         <!-- Drag trail line -->
         <div class="drag-line" id="dragLine"></div>
@@ -267,29 +267,38 @@
             return distance < 40; // Within 40px of center target
         }
 
-        // Show only current available dot
+        // FIXED: Force show current dot with maximum visibility
         function showCurrentDot() {
-            // Hide all dots first
+            console.log('Showing dot for index:', currentAvailableDot); // Debug
+            
+            // Force hide all dots
             groundMemories.forEach(memory => {
                 const dot = document.getElementById(memory.dotId);
-                dot.style.display = 'none';
+                dot.style.display = 'none !important';
+                dot.style.opacity = '0';
+                dot.style.visibility = 'hidden';
             });
             
-            // Show only current available dot
+            // Force show only current available dot
             if (currentAvailableDot < groundMemories.length) {
                 const currentMemory = groundMemories[currentAvailableDot];
                 const currentDot = document.getElementById(currentMemory.dotId);
-                currentDot.style.display = 'block';
-                currentDot.style.opacity = '0.9';
-                currentDot.style.pointerEvents = 'all';
                 
-                // Reset position to bottom center
-                currentDot.style.position = 'absolute';
-                currentDot.style.left = '50%';
-                currentDot.style.bottom = '10%';
-                currentDot.style.top = 'auto';
-                currentDot.style.transform = 'translateX(-50%)';
-                currentDot.style.zIndex = '1000';
+                // Force maximum visibility
+                currentDot.style.display = 'block !important';
+                currentDot.style.opacity = '1 !important';
+                currentDot.style.visibility = 'visible !important';
+                currentDot.style.pointerEvents = 'all !important';
+                currentDot.style.zIndex = '9999 !important';
+                
+                // Force position at bottom center
+                currentDot.style.position = 'fixed !important';
+                currentDot.style.left = '50% !important';
+                currentDot.style.bottom = '8% !important';
+                currentDot.style.top = 'auto !important';
+                currentDot.style.transform = 'translateX(-50%) !important';
+                
+                console.log('Current dot should be visible:', currentDot.id); // Debug
             }
         }
 
