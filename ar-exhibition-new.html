@@ -490,10 +490,10 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion + enable manual rotation
+                // Start final elemental motion + enable double-tap rotation
                 setTimeout(() => {
                     memory.emit('finalMotion');
-                    enableManualRotation(memory);
+                    enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -514,83 +514,58 @@
             }
         }
 
-        // Manual rotation for Geloras
-        function enableManualRotation(memory) {
-            let isRotating = false;
-            let startX = 0;
-            let currentRotationY = 0;
+        // Double-tap rotation for Geloras
+        function enableDoubleTapRotation(memory) {
+            let tapCount = 0;
+            let tapTimer = null;
             
-            // Store reference to automatic rotation
-            let autoRotationPaused = false;
+            memory.addEventListener('click', handleTap);
+            memory.addEventListener('touchend', handleTap, { passive: false });
             
-            memory.addEventListener('mousedown', startRotation);
-            memory.addEventListener('touchstart', startRotation, { passive: false });
-            
-            function startRotation(e) {
-                isRotating = true;
+            function handleTap(e) {
+                tapCount++;
                 
-                // Pause automatic rotation
-                const rotationAnim = memory.components['animation__wood-rotate360'] || 
-                                   memory.components['animation__fire-rotate360'] || 
-                                   memory.components['animation__metal-rotate360'] || 
-                                   memory.components['animation__water-rotate360'];
-                if (rotationAnim) {
-                    rotationAnim.pauseAnimation();
-                    autoRotationPaused = true;
+                if (tapCount === 1) {
+                    // Start timer for double-tap detection
+                    tapTimer = setTimeout(() => {
+                        tapCount = 0; // Reset if no second tap
+                    }, 300); // 300ms window for double-tap
+                } else if (tapCount === 2) {
+                    // Double-tap detected!
+                    clearTimeout(tapTimer);
+                    tapCount = 0;
+                    
+                    rotateGelora90Degrees(memory);
                 }
-                
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                startX = clientX;
-                
-                // Get current rotation
-                const rotation = memory.getAttribute('rotation');
-                currentRotationY = rotation.y;
                 
                 e.preventDefault();
                 e.stopPropagation();
             }
             
-            document.addEventListener('mousemove', rotateGelora);
-            document.addEventListener('touchmove', rotateGelora, { passive: false });
-            
-            function rotateGelora(e) {
-                if (!isRotating) return;
-                
-                const clientX = e.clientX || (e.touches && e.touches[0].clientX);
-                const deltaX = clientX - startX;
-                
-                // Convert drag distance to rotation (adjust sensitivity)
-                const rotationSpeed = 0.5;
-                const newRotationY = currentRotationY + (deltaX * rotationSpeed);
-                
-                // Apply manual rotation while preserving other rotations
+            function rotateGelora90Degrees(memory) {
+                // Get current rotation
                 const currentRotation = memory.getAttribute('rotation');
-                memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                const newRotationY = currentRotation.y + 90; // Rotate 90 degrees each double-tap
                 
-                e.preventDefault();
-            }
-            
-            document.addEventListener('mouseup', endRotation);
-            document.addEventListener('touchend', endRotation);
-            
-            function endRotation(e) {
-                if (!isRotating) return;
+                // Create smooth rotation animation
+                const rotationAnimation = document.createElement('a-animation');
+                rotationAnimation.setAttribute('attribute', 'rotation');
+                rotationAnimation.setAttribute('from', `${currentRotation.x} ${currentRotation.y} ${currentRotation.z}`);
+                rotationAnimation.setAttribute('to', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                rotationAnimation.setAttribute('dur', '800'); // 0.8 second smooth rotation
+                rotationAnimation.setAttribute('easing', 'easeInOutQuad');
                 
-                isRotating = false;
+                // Add animation to memory and start it
+                memory.appendChild(rotationAnimation);
                 
-                // Resume automatic rotation from current position
-                if (autoRotationPaused) {
-                    const rotationAnim = memory.components['animation__wood-rotate360'] || 
-                                       memory.components['animation__fire-rotate360'] || 
-                                       memory.components['animation__metal-rotate360'] || 
-                                       memory.components['animation__water-rotate360'];
-                    if (rotationAnim) {
-                        rotationAnim.resumeAnimation();
-                        autoRotationPaused = false;
+                // Remove animation element after completion
+                setTimeout(() => {
+                    if (rotationAnimation.parentNode) {
+                        rotationAnimation.parentNode.removeChild(rotationAnimation);
                     }
-                }
-                
-                e.preventDefault();
+                    // Update the actual rotation attribute
+                    memory.setAttribute('rotation', `${currentRotation.x} ${newRotationY} ${currentRotation.z}`);
+                }, 800);
             }
         }
 
