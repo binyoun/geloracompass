@@ -220,7 +220,7 @@
         <div class="center-target" id="centerTarget"></div>
         
         <!-- View control buttons -->
-        <div class="view-controls" id="viewControls" style="display: none;">
+        <div class="view-controls" id="viewControls">
             <button class="view-btn" id="viewHigh">👁️ High</button>
             <button class="view-btn" id="viewNormal">👁️ Normal</button>
             <button class="view-btn" id="viewLow">👁️ Low</button>
@@ -577,13 +577,15 @@
                     document.getElementById('instructions').style.display = 'none';
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
-                    document.getElementById('viewControls').style.display = 'flex';
-                    
-                    // Initialize view controls when all Geloras are present
-                    initializeViewControls();
+                    // View controls are already visible
                 }, 2000);
             }
         }
+
+        // Initialize view controls immediately when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            initializeViewControls();
+        });
 
         // Initialize draggable dots
         elementalMemories.forEach(memory => {
