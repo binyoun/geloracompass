@@ -519,24 +519,29 @@
             let isDragging = false;
             let startY = 0;
             let startPosition = { x: 0, y: 0, z: 0 };
+            let dragStartTime = 0;
             
-            // Add visual feedback - make it slightly larger when touched
             memory.addEventListener('mousedown', startDrag);
             memory.addEventListener('touchstart', startDrag, { passive: false });
             
             function startDrag(e) {
                 isDragging = true;
+                dragStartTime = Date.now();
                 
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 startY = clientY;
                 
-                // Get starting position
+                // Get current position (not starting position)
                 const position = memory.getAttribute('position');
                 startPosition = { x: position.x, y: position.y, z: position.z };
                 
-                // Visual feedback - slightly enlarge
+                // Visual feedback
                 const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x * 1.05} ${currentScale.y * 1.05} ${currentScale.z * 1.05}`);
+                memory.setAttribute('animation__drag-scale', {
+                    property: 'scale',
+                    to: `${currentScale.x * 1.05} ${currentScale.y * 1.05} ${currentScale.z * 1.05}`,
+                    dur: 200
+                });
                 
                 e.preventDefault();
                 e.stopPropagation();
@@ -551,16 +556,16 @@
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 const deltaY = startY - clientY; // Invert so up drag moves up
                 
-                // Convert drag distance to world units (adjust sensitivity)
-                const sensitivity = 0.002;
+                // Increased sensitivity for more responsive movement
+                const sensitivity = 0.004;
                 const newY = startPosition.y + (deltaY * sensitivity);
                 
-                // Limit vertical movement range (prevent going too high or low)
-                const minY = startPosition.y - 1.0; // 1 unit below start
-                const maxY = startPosition.y + 1.5; // 1.5 units above start
+                // More generous movement range
+                const minY = startPosition.y - 2.0;
+                const maxY = startPosition.y + 2.0;
                 const clampedY = Math.max(minY, Math.min(maxY, newY));
                 
-                // Update position
+                // Update position immediately
                 memory.setAttribute('position', `${startPosition.x} ${clampedY} ${startPosition.z}`);
                 
                 e.preventDefault();
@@ -572,14 +577,54 @@
             function endDrag(e) {
                 if (!isDragging) return;
                 
+                const dragDuration = Date.now() - dragStartTime;
                 isDragging = false;
                 
                 // Return to normal scale
                 const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x / 1.05} ${currentScale.y / 1.05} ${currentScale.z / 1.05}`);
+                memory.setAttribute('animation__drag-scale-back', {
+                    property: 'scale',
+                    to: `${currentScale.x / 1.05} ${currentScale.y / 1.05} ${currentScale.z / 1.05}`,
+                    dur: 200
+                });
+                
+                // Check for quick tap (potential double-tap)
+                if (dragDuration < 200) {
+                    checkForDoubleTap(memory);
+                }
                 
                 e.preventDefault();
             }
+        }
+
+        // Double-tap rotation
+        let lastTapTime = 0;
+        let lastTappedMemory = null;
+        
+        function checkForDoubleTap(memory) {
+            const currentTime = Date.now();
+            
+            if (currentTime - lastTapTime < 500 && lastTappedMemory === memory) {
+                // Double-tap detected!
+                rotateGelora90Degrees(memory);
+                lastTapTime = 0;
+                lastTappedMemory = null;
+            } else {
+                lastTapTime = currentTime;
+                lastTappedMemory = memory;
+            }
+        }
+        
+        function rotateGelora90Degrees(memory) {
+            const currentRotation = memory.getAttribute('rotation');
+            const newRotationY = currentRotation.y + 90;
+            
+            memory.setAttribute('animation__manual-rotate', {
+                property: 'rotation',
+                to: `${currentRotation.x} ${newRotationY} ${currentRotation.z}`,
+                dur: 600,
+                easing: 'easeInOutQuad'
+            });
         }
 
         // Initialize draggable dots
