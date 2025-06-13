@@ -193,35 +193,35 @@
     </div>
 
     <script>
-        // Ground awareness configuration with well-separated positions
+        // Ground awareness configuration with lowered positions for flowers/plants
         const groundMemories = [
             {
                 id: 'east-ground',
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.2, y: -0.3, z: -1.8 }
+                position: { x: 2.2, y: -0.8, z: -1.8 } // Much lower - ground level
             },
             {
                 id: 'south-ground',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.6,
-                position: { x: -1.2, y: 0.1, z: -0.5 } // Higher and further left
+                position: { x: -1.2, y: -0.6, z: -0.5 } // Lower for plant life
             },
             {
                 id: 'west-ground',
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.2, y: -0.2, z: -2.5 }
+                position: { x: -2.2, y: -0.7, z: -2.5 } // Ground level
             },
             {
                 id: 'north-ground',
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.1, z: -3.8 } // Much different x and higher than south
+                position: { x: 1.5, y: -0.7, z: -3.8 } // Much lower than before
             }
         ];
 
@@ -347,56 +347,77 @@
                 'dur: 3000; easing: easeOutQuart; startEvents: emergeAtCenter'
             );
             
-            // Grow from tiny to human size while at center
+            // Grow from tiny to human size while at center - 3x SLOWER (was 4s, now 12s)
             memory.setAttribute('animation__grow-at-center', 
                 `property: scale; from: 0.01 0.01 0.01; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 4000; easing: easeOutElastic; startEvents: growAtCenter'
+                'dur: 12000; easing: easeOutElastic; startEvents: growAtCenter'
             );
             
-            // Gentle swirling while growing at center
+            // Gentle swirling while growing at center - slower for organic feel
             memory.setAttribute('animation__center-swirl', 
                 'property: rotation; from: 0 0 0; to: 0 720 0; ' +
-                'dur: 4000; easing: easeInOutSine; startEvents: centerSwirl'
+                'dur: 12000; easing: easeInOutSine; startEvents: centerSwirl'
             );
             
-            // Move from center to final position after growing
+            // Move from center to final position - 2.5x SLOWER (was 4s, now 10s)
             memory.setAttribute('animation__move-to-final-position', 
                 'property: position; ' +
-                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
-                'dur: 4000; easing: easeInOutQuart; startEvents: moveToFinalPosition'
+                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                'dur: 10000; easing: easeInOutQuart; startEvents: moveToFinalPosition'
             );
             
-            // Enhanced floating motion when settled at final position
+            // Enhanced floating motion for plant/flower life - closer to ground
             memory.setAttribute('animation__final-float', 
-                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
-                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.7} ${memoryConfig.position.z}; ` +
-                'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalFloat'
+                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.25} ${memoryConfig.position.z}; ` +
+                'dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: finalFloat'
             );
             
-            // SUPER FAST swirling - 3x faster than before (was 10s, now 3.3s)
+            // SLOWER organic swirling - 3.5x slower (was 3.3s, now 11.5s)
             memory.setAttribute('animation__final-swirl', 
                 'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                'dur: 3300; easing: linear; loop: true; startEvents: finalSwirl'
+                'dur: 11500; easing: linear; loop: true; startEvents: finalSwirl'
             );
             
-            // ULTRA RAPID spinning - 3x faster (was 8s, now 2.7s)
+            // SLOWER organic spinning - 3.5x slower (was 2.7s, now 9.5s)
             memory.setAttribute('animation__rapid-spin', 
                 'property: rotation; from: 0 0 0; to: 0 720 0; ' +
-                'dur: 2700; easing: linear; loop: true; startEvents: rapidSpin'
+                'dur: 9500; easing: linear; loop: true; startEvents: rapidSpin'
             );
             
-            // Pulsing scale for breathing effect
+            // Enhanced breathing pulse for organic life - more pronounced
             memory.setAttribute('animation__final-pulse', 
                 `property: scale; from: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                `to: ${memoryConfig.scale * 1.15} ${memoryConfig.scale * 1.15} ${memoryConfig.scale * 1.15}; ` +
-                'dir: alternate; dur: 3000; easing: easeInOutSine; loop: true; startEvents: finalPulse'
+                `to: ${memoryConfig.scale * 1.25} ${memoryConfig.scale * 1.25} ${memoryConfig.scale * 1.25}; ` +
+                'dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; startEvents: finalPulse'
             );
             
-            // Orbital movement for even more dynamic floating
+            // Enhanced organic breathing - secondary pulse
+            memory.setAttribute('animation__deep-breath', 
+                `property: scale; from: ${memoryConfig.scale * 0.95} ${memoryConfig.scale * 0.95} ${memoryConfig.scale * 0.95}; ` +
+                `to: ${memoryConfig.scale * 1.1} ${memoryConfig.scale * 1.1} ${memoryConfig.scale * 1.1}; ` +
+                'dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: deepBreath'
+            );
+            
+            // Enhanced orbital movement for hybrid organism life
             memory.setAttribute('animation__orbital-float', 
-                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
-                `to: ${memoryConfig.position.x + 0.3} ${memoryConfig.position.y + 0.6} ${memoryConfig.position.z + 0.2}; ` +
-                'dir: alternate; dur: 7000; easing: easeInOutSine; loop: true; startEvents: orbitalFloat'
+                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x + 0.4} ${memoryConfig.position.y + 0.3} ${memoryConfig.position.z + 0.3}; ` +
+                'dir: alternate; dur: 8000; easing: easeInOutSine; loop: true; startEvents: orbitalFloat'
+            );
+            
+            // Additional organic swaying motion
+            memory.setAttribute('animation__organic-sway', 
+                `property: position; from: ${memoryConfig.position.x - 0.2} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z - 0.1}; ` +
+                `to: ${memoryConfig.position.x + 0.2} ${memoryConfig.position.y + 0.2} ${memoryConfig.position.z + 0.1}; ` +
+                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: organicSway'
+            );
+            
+            // Organic growth pulsing - like living cells
+            memory.setAttribute('animation__cellular-pulse', 
+                `property: scale; from: ${memoryConfig.scale * 0.98} ${memoryConfig.scale * 0.98} ${memoryConfig.scale * 0.98}; ` +
+                `to: ${memoryConfig.scale * 1.08} ${memoryConfig.scale * 1.08} ${memoryConfig.scale * 1.08}; ` +
+                'dir: alternate; dur: 7000; easing: easeInOutSine; loop: true; startEvents: cellularPulse'
             );
             
             container.appendChild(memory);
@@ -415,19 +436,22 @@
                     memory.emit('centerSwirl');
                 }, 500);
                 
-                // 3. Move to final position after fully grown at center
+                // 3. Move to final position after fully grown at center - SLOWER timing
                 setTimeout(() => {
                     memory.emit('moveToFinalPosition');
-                }, 4500);
+                }, 12500);
                 
-                // 4. Start ultra-fast floating motions at final position
+                // 4. Start organic life motions at final position - SLOWER timing
                 setTimeout(() => {
                     memory.emit('finalFloat');
                     memory.emit('finalSwirl');
                     memory.emit('rapidSpin');
                     memory.emit('finalPulse');
+                    memory.emit('deepBreath');
                     memory.emit('orbitalFloat');
-                }, 8500);
+                    memory.emit('organicSway');
+                    memory.emit('cellularPulse');
+                }, 22500);
             });
             
             awakenedMemories.add(memoryConfig.id);
