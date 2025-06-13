@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>AR Garden Discovery</title>
+    <title>Meditative AR Garden</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -11,7 +11,7 @@
             margin: 0; 
             font-family: Arial; 
             overflow: hidden; 
-            background: black;
+            background: #0a0a0a;
         }
         
         .overlay {
@@ -24,383 +24,370 @@
             z-index: 999;
         }
         
-        .minimal-instructions {
+        .zen-instructions {
             position: absolute;
-            top: 30px;
+            top: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 20px;
+            background: rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.9);
+            padding: 15px 25px;
+            border-radius: 25px;
             text-align: center;
-            font-size: 13px;
-            max-width: 70%;
-            backdrop-filter: blur(10px);
+            font-size: 12px;
+            max-width: 60%;
+            backdrop-filter: blur(5px);
+            font-weight: 300;
         }
         
-        /* Invisible directional zones for compact movement */
-        .discovery-zone {
+        /* Full-screen tap detection */
+        .tap-surface {
             position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: all;
             background: transparent;
-            border: none;
-            opacity: 0;
-        }
-        
-        .zone-east {
-            right: 10%;
-            top: 30%;
-            width: 25%;
-            height: 40%;
-        }
-        
-        .zone-west {
-            left: 10%;
-            top: 30%;
-            width: 25%;
-            height: 40%;
-        }
-        
-        .zone-north {
-            top: 15%;
-            left: 30%;
-            width: 40%;
-            height: 25%;
-        }
-        
-        .zone-south {
-            bottom: 15%;
-            left: 30%;
-            width: 40%;
-            height: 25%;
+            cursor: crosshair;
         }
         
         .progress-counter {
             position: absolute;
-            top: 80px;
-            right: 25px;
-            background: rgba(255,255,255,0.8);
+            top: 90px;
+            right: 30px;
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.8);
             padding: 8px 12px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 12px;
-            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            font-weight: 300;
+            font-size: 11px;
+            backdrop-filter: blur(3px);
         }
         
-        /* Enhanced discovery pulse */
+        /* Colored discovery pulses for each direction */
         .discovery-pulse {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            border: 3px solid rgba(255,215,0,0.9);
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, rgba(255,215,0,0.1) 70%, transparent 100%);
-            animation: discoveryPulse 2s ease-out;
             pointer-events: none;
             display: none;
-            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+            transform: translate(-50%, -50%);
         }
         
-        @keyframes discoveryPulse {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-                opacity: 1;
-            }
-            50% {
-                transform: translate(-50%, -50%) scale(1.5);
-                opacity: 0.8;
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(4);
-                opacity: 0;
-            }
+        .pulse-east {
+            border: 4px solid rgba(0,255,127,0.9);
+            background: radial-gradient(circle, rgba(0,255,127,0.3) 0%, rgba(0,255,127,0.1) 60%, transparent 100%);
+            box-shadow: 0 0 30px rgba(0,255,127,0.6), inset 0 0 20px rgba(0,255,127,0.2);
+            animation: pulseGreen 2.5s ease-out;
+        }
+        
+        .pulse-south {
+            border: 4px solid rgba(255,20,147,0.9);
+            background: radial-gradient(circle, rgba(255,20,147,0.3) 0%, rgba(255,20,147,0.1) 60%, transparent 100%);
+            box-shadow: 0 0 30px rgba(255,20,147,0.6), inset 0 0 20px rgba(255,20,147,0.2);
+            animation: pulsePink 2.5s ease-out;
+        }
+        
+        .pulse-west {
+            border: 4px solid rgba(255,255,255,0.9);
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 60%, transparent 100%);
+            box-shadow: 0 0 30px rgba(255,255,255,0.6), inset 0 0 20px rgba(255,255,255,0.2);
+            animation: pulseWhite 2.5s ease-out;
+        }
+        
+        .pulse-north {
+            border: 4px solid rgba(173,216,230,0.9);
+            background: radial-gradient(circle, rgba(173,216,230,0.3) 0%, rgba(173,216,230,0.1) 60%, transparent 100%);
+            box-shadow: 0 0 30px rgba(173,216,230,0.6), inset 0 0 20px rgba(173,216,230,0.2);
+            animation: pulseBlue 2.5s ease-out;
+        }
+        
+        @keyframes pulseGreen {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+        
+        @keyframes pulsePink {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+        
+        @keyframes pulseWhite {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
+        }
+        
+        @keyframes pulseBlue {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(2.5); opacity: 0; }
         }
         
         .completion-message {
             position: absolute;
-            bottom: 30px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 20px;
-            font-size: 14px;
+            background: rgba(0,0,0,0.6);
+            color: rgba(255,255,255,0.9);
+            padding: 20px 30px;
+            border-radius: 25px;
+            font-size: 13px;
             display: none;
             text-align: center;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
+            font-weight: 300;
         }
         
-        .movement-guide {
+        .tap-hint {
             position: absolute;
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(255,255,255,0.1);
-            color: white;
-            padding: 8px 15px;
+            color: rgba(255,255,255,0.7);
+            padding: 8px 16px;
             border-radius: 15px;
-            font-size: 11px;
-            backdrop-filter: blur(5px);
+            font-size: 10px;
+            backdrop-filter: blur(3px);
+            font-weight: 300;
         }
     </style>
 </head>
 <body>
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
-        <!-- Compact positioning for 100cm x 180cm space -->
+        <!-- Container for dynamically positioned sculptures -->
+        <a-entity id="sculpture-container"></a-entity>
         
-        <!-- EAST: Right side, ground level, closer -->
-        <a-gltf-model 
-            id="east-artwork"
-            src="" 
-            scale="0 0 0" 
-            position="1.5 -0.5 -1.8"
-            animation__emerge="property: position; from: 1.5 -1.2 -1.8; to: 1.5 -0.1 -1.8; dur: 3000; easing: easeOutQuart; startEvents: emerge"
-            animation__grow="property: scale; from: 0.1 0.1 0.1; to: 1.4 1.4 1.4; dur: 2500; easing: easeOutElastic; startEvents: grow"
-            animation__float="property: position; from: 1.5 -0.1 -1.8; to: 1.5 0.1 -1.8; dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: float"
-            animation__sway="property: rotation; to: 0 360 0; dur: 15000; loop: true; startEvents: sway"
-            visible="false">
-        </a-gltf-model>
-        
-        <!-- SOUTH: Front, ground level -->
-        <a-gltf-model 
-            id="south-artwork"
-            src="" 
-            scale="0 0 0" 
-            position="0 -0.5 -1.2"
-            animation__emerge="property: position; from: 0 -1.2 -1.2; to: 0 -0.1 -1.2; dur: 3000; easing: easeOutQuart; startEvents: emerge"
-            animation__grow="property: scale; from: 0.1 0.1 0.1; to: 1.3 1.3 1.3; dur: 2500; easing: easeOutElastic; startEvents: grow"
-            animation__float="property: position; from: 0 -0.1 -1.2; to: 0 0.1 -1.2; dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: float"
-            animation__sway="property: rotation; to: 0 -360 0; dur: 18000; loop: true; startEvents: sway"
-            visible="false">
-        </a-gltf-model>
-        
-        <!-- WEST: Left side, ground level, closer -->
-        <a-gltf-model 
-            id="west-artwork"
-            src="" 
-            scale="0 0 0" 
-            position="-1.5 -0.5 -1.8"
-            animation__emerge="property: position; from: -1.5 -1.2 -1.8; to: -1.5 -0.1 -1.8; dur: 3000; easing: easeOutQuart; startEvents: emerge"
-            animation__grow="property: scale; from: 0.1 0.1 0.1; to: 1.4 1.4 1.4; dur: 2500; easing: easeOutElastic; startEvents: grow"
-            animation__float="property: position; from: -1.5 -0.1 -1.8; to: -1.5 0.1 -1.8; dir: alternate; dur: 4500; easing: easeInOutSine; loop: true; startEvents: float"
-            animation__sway="property: rotation; to: 0 360 0; dur: 20000; loop: true; startEvents: sway"
-            visible="false">
-        </a-gltf-model>
-        
-        <!-- NORTH: Back center, ground level -->
-        <a-gltf-model 
-            id="north-artwork"
-            src="" 
-            scale="0 0 0" 
-            position="0 -0.5 -2.5"
-            animation__emerge="property: position; from: 0 -1.2 -2.5; to: 0 -0.1 -2.5; dur: 3000; easing: easeOutQuart; startEvents: emerge"
-            animation__grow="property: scale; from: 0.1 0.1 0.1; to: 1.6 1.6 1.6; dur: 2500; easing: easeOutElastic; startEvents: grow"
-            animation__float="property: position; from: 0 -0.1 -2.5; to: 0 0.1 -2.5; dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: float"
-            animation__sway="property: rotation; to: 0 360 0; dur: 22000; loop: true; startEvents: sway"
-            visible="false">
-        </a-gltf-model>
-        
-        <a-entity camera look-controls wasd-controls="enabled: false"></a-entity>
+        <a-entity camera look-controls="enabled: true; pointerLockEnabled: false" wasd-controls="enabled: false"></a-entity>
     </a-scene>
 
     <div class="overlay">
-        <div class="minimal-instructions" id="instructions">
-            Take 2-3 steps and tap to discover sculptures 🌱
+        <div class="zen-instructions" id="instructions">
+            Breathe deeply. Touch the ground to grow your garden 🌱
         </div>
         
         <div class="progress-counter" id="progress">
-            <span id="count">0</span>/4
+            Bloomed: <span id="count">0</span>/4
         </div>
         
-        <div class="movement-guide" id="movementGuide">
-            Move in small circle • Stay within 1 meter
+        <div class="tap-hint" id="tapHint">
+            Tap anywhere on the ground plane
         </div>
         
-        <!-- Invisible discovery zones -->
-        <div class="discovery-zone zone-east" id="zoneEast"></div>
-        <div class="discovery-zone zone-west" id="zoneWest"></div>
-        <div class="discovery-zone zone-north" id="zoneNorth"></div>
-        <div class="discovery-zone zone-south" id="zoneSouth"></div>
+        <!-- Full-screen tap surface -->
+        <div class="tap-surface" id="tapSurface"></div>
         
-        <div class="discovery-pulse" id="discoveryPulse"></div>
+        <!-- Colored discovery pulses -->
+        <div class="discovery-pulse pulse-east" id="pulseEast"></div>
+        <div class="discovery-pulse pulse-south" id="pulseSouth"></div>
+        <div class="discovery-pulse pulse-west" id="pulseWest"></div>
+        <div class="discovery-pulse pulse-north" id="pulseNorth"></div>
         
         <div class="completion-message" id="completionMessage">
-            ✨ Garden Complete ✨<br>
-            <small>Shake to explore again</small>
+            ✨ Your meditation garden is complete ✨<br>
+            <small>Breathe and observe • Shake to begin anew</small>
         </div>
     </div>
 
     <script>
-        // Artwork configuration
-        const artworkConfig = {
-            'east-artwork': {
+        // Meditative garden configuration
+        const artworkSequence = [
+            {
+                id: 'east-artwork',
                 src: 'east-piece.glb',
-                name: 'Eastern Guardian',
-                discovered: false
+                name: 'Eastern Serenity',
+                color: 'green',
+                pulseId: 'pulseEast'
             },
-            'south-artwork': {
+            {
+                id: 'south-artwork',
                 src: 'south-piece.glb',
-                name: 'Southern Bloom',
-                discovered: false
+                name: 'Southern Harmony',
+                color: 'pink',
+                pulseId: 'pulseSouth'
             },
-            'west-artwork': {
+            {
+                id: 'west-artwork',
                 src: 'west-piece.glb',
-                name: 'Western Spirit',
-                discovered: false
+                name: 'Western Peace',
+                color: 'white',
+                pulseId: 'pulseWest'
             },
-            'north-artwork': {
+            {
+                id: 'north-artwork',
                 src: 'north-piece.glb',
-                name: 'Northern Crown',
-                discovered: false
+                name: 'Northern Wisdom',
+                color: 'blue',
+                pulseId: 'pulseNorth'
             }
-        };
+        ];
 
-        let discoveredCount = 0;
-        const loadingPromises = new Map();
+        let currentArtworkIndex = 0;
+        let growthCount = 0;
+        const grownSculptures = new Set();
 
-        // Enhanced discovery function with clear animation sequence
-        function discoverArtwork(artworkId) {
-            if (artworkConfig[artworkId].discovered) return;
+        // Convert screen coordinates to 3D world position
+        function screenToWorld(screenX, screenY) {
+            const camera = document.querySelector('[camera]');
+            const canvas = document.querySelector('a-scene').canvas;
             
-            const config = artworkConfig[artworkId];
-            const model = document.getElementById(artworkId);
+            // Normalize screen coordinates (-1 to 1)
+            const x = (screenX / canvas.clientWidth) * 2 - 1;
+            const y = -(screenY / canvas.clientHeight) * 2 + 1;
             
-            // Show enhanced discovery pulse
-            showDiscoveryPulse();
+            // Project ray from camera
+            const cameraPos = camera.object3D.position;
+            const cameraRot = camera.object3D.rotation;
             
-            // Mark as discovered
-            artworkConfig[artworkId].discovered = true;
-            discoveredCount++;
+            // Calculate ground intersection (Y = -0.5)
+            const groundY = -0.5;
+            const rayLength = Math.abs((cameraPos.y - groundY) / Math.sin(cameraRot.x || -0.1));
+            
+            // Calculate world position
+            const worldX = cameraPos.x + (x * rayLength * 0.3);
+            const worldZ = cameraPos.z - (rayLength * 0.8);
+            
+            return {
+                x: Math.max(-2, Math.min(2, worldX)),
+                y: groundY,
+                z: Math.max(-3, Math.min(-0.5, worldZ))
+            };
+        }
+
+        // Meditative tap handler
+        document.getElementById('tapSurface').addEventListener('click', function(event) {
+            if (currentArtworkIndex >= artworkSequence.length) return;
+
+            const currentArtwork = artworkSequence[currentArtworkIndex];
+            const tapPosition = screenToWorld(event.clientX, event.clientY);
+            
+            // Show colored discovery pulse at tap location
+            showColoredPulse(currentArtwork.pulseId, event.clientX, event.clientY);
+            
+            // Create and grow sculpture at tap location
+            createAndGrowSculpture(currentArtwork, tapPosition);
+            
+            currentArtworkIndex++;
+            growthCount++;
             updateProgress();
-            
-            // Load model silently
-            if (!loadingPromises.has(artworkId)) {
-                const loadPromise = loadModelSilently(model, config.src);
-                loadingPromises.set(artworkId, loadPromise);
-                
-                loadPromise.then(() => {
-                    showArtworkWithSequence(artworkId);
-                }).catch(() => {
-                    // Handle error silently
-                    artworkConfig[artworkId].discovered = false;
-                    discoveredCount--;
-                    updateProgress();
-                });
-            }
-        }
+        });
 
-        function loadModelSilently(model, src) {
-            return new Promise((resolve, reject) => {
-                model.setAttribute('src', src);
-                
-                const onLoad = () => {
-                    model.removeEventListener('model-loaded', onLoad);
-                    model.removeEventListener('model-error', onError);
-                    resolve();
-                };
-                
-                const onError = () => {
-                    model.removeEventListener('model-loaded', onLoad);
-                    model.removeEventListener('model-error', onError);
-                    reject();
-                };
-                
-                model.addEventListener('model-loaded', onLoad);
-                model.addEventListener('model-error', onError);
-            });
-        }
-
-        function showArtworkWithSequence(artworkId) {
-            const model = document.getElementById(artworkId);
-            
-            // Make visible with small initial scale
-            model.setAttribute('visible', true);
-            model.setAttribute('scale', '0.1 0.1 0.1');
-            
-            // Sequence: Emerge from ground (0.5s delay) → Grow (immediate) → Float (2s delay) → Sway (3s delay)
-            setTimeout(() => {
-                model.emit('emerge');
-            }, 500);
-            
-            setTimeout(() => {
-                model.emit('grow');
-            }, 800);
-            
-            setTimeout(() => {
-                model.emit('float');
-            }, 3500);
-            
-            setTimeout(() => {
-                model.emit('sway');
-            }, 4000);
-        }
-
-        function showDiscoveryPulse() {
-            const pulse = document.getElementById('discoveryPulse');
+        function showColoredPulse(pulseId, x, y) {
+            const pulse = document.getElementById(pulseId);
+            pulse.style.left = x + 'px';
+            pulse.style.top = y + 'px';
             pulse.style.display = 'block';
             pulse.style.animation = 'none';
             
-            // Trigger reflow to restart animation
+            // Restart animation
             pulse.offsetHeight;
-            pulse.style.animation = 'discoveryPulse 2s ease-out';
+            pulse.style.animation = pulse.className.includes('pulse-east') ? 'pulseGreen 2.5s ease-out' :
+                                  pulse.className.includes('pulse-south') ? 'pulsePink 2.5s ease-out' :
+                                  pulse.className.includes('pulse-west') ? 'pulseWhite 2.5s ease-out' :
+                                  'pulseBlue 2.5s ease-out';
             
             setTimeout(() => {
                 pulse.style.display = 'none';
-            }, 2000);
+            }, 2500);
+        }
+
+        function createAndGrowSculpture(artworkConfig, position) {
+            const container = document.getElementById('sculpture-container');
+            
+            // Create sculpture element
+            const sculpture = document.createElement('a-gltf-model');
+            sculpture.setAttribute('id', artworkConfig.id);
+            sculpture.setAttribute('src', artworkConfig.src);
+            sculpture.setAttribute('position', `${position.x} ${position.y - 0.3} ${position.z}`);
+            sculpture.setAttribute('scale', '0 0 0');
+            sculpture.setAttribute('visible', false);
+            
+            // Add calm growth animation
+            sculpture.setAttribute('animation__emerge', 
+                'property: position; ' +
+                `from: ${position.x} ${position.y - 0.8} ${position.z}; ` +
+                `to: ${position.x} ${position.y + 0.1} ${position.z}; ` +
+                'dur: 5000; easing: easeOutQuart; startEvents: emerge'
+            );
+            
+            sculpture.setAttribute('animation__grow', 
+                'property: scale; from: 0 0 0; to: 1.2 1.2 1.2; ' +
+                'dur: 6000; easing: easeOutElastic; startEvents: grow'
+            );
+            
+            sculpture.setAttribute('animation__breathe', 
+                `property: position; from: ${position.x} ${position.y + 0.1} ${position.z}; ` +
+                `to: ${position.x} ${position.y + 0.15} ${position.z}; ` +
+                'dir: alternate; dur: 8000; easing: easeInOutSine; loop: true; startEvents: breathe'
+            );
+            
+            sculpture.setAttribute('animation__gentle-turn', 
+                'property: rotation; to: 0 30 0; ' +
+                'dur: 60000; easing: easeInOutSine; startEvents: turn'
+            );
+            
+            container.appendChild(sculpture);
+            
+            // Load and show with meditation timing
+            sculpture.addEventListener('model-loaded', function() {
+                setTimeout(() => {
+                    sculpture.setAttribute('visible', true);
+                    sculpture.emit('emerge');
+                }, 300);
+                
+                setTimeout(() => {
+                    sculpture.emit('grow');
+                }, 800);
+                
+                setTimeout(() => {
+                    sculpture.emit('breathe');
+                    sculpture.emit('turn');
+                }, 5500);
+            });
+            
+            sculpture.addEventListener('model-error', function() {
+                console.log(`Failed to load ${artworkConfig.name}`);
+            });
+            
+            grownSculptures.add(artworkConfig.id);
         }
 
         function updateProgress() {
-            document.getElementById('count').textContent = discoveredCount;
+            document.getElementById('count').textContent = growthCount;
             
-            if (discoveredCount >= 4) {
-                // All discovered - show completion
+            if (growthCount >= 4) {
+                // Meditation complete
                 setTimeout(() => {
                     document.getElementById('instructions').style.display = 'none';
-                    document.getElementById('movementGuide').style.display = 'none';
+                    document.getElementById('tapHint').style.display = 'none';
                     document.getElementById('completionMessage').style.display = 'block';
                 }, 3000);
             } else {
-                // Update instructions based on progress
-                updateInstructions();
+                updateMeditativeInstructions();
             }
         }
 
-        function updateInstructions() {
+        function updateMeditativeInstructions() {
             const instructions = document.getElementById('instructions');
-            const movementGuide = document.getElementById('movementGuide');
-            
             const messages = [
-                "Take 2-3 steps and tap to discover sculptures 🌱",
-                "Keep exploring in small circle... more await 🌿",
-                "Almost complete... one more direction 🌸",
-                "Find the final piece to finish your garden 🌺"
+                "Breathe deeply. Touch the ground to grow your garden 🌱",
+                "Feel the earth. Another sculpture awaits your touch 🌿",
+                "Center yourself. Two more await your presence 🌸",
+                "Almost complete. One final touch needed 🌺"
             ];
             
-            const guides = [
-                "Move in small circle • Stay within 1 meter",
-                "Step to different sides • Tap when ready",
-                "One more direction to explore",
-                "Final sculpture awaits discovery"
-            ];
-            
-            if (discoveredCount < messages.length) {
-                instructions.innerHTML = messages[discoveredCount];
-                movementGuide.innerHTML = guides[discoveredCount];
+            if (growthCount < messages.length) {
+                instructions.innerHTML = messages[growthCount];
             }
         }
 
-        // Discovery zone handlers
-        document.getElementById('zoneEast').addEventListener('click', () => discoverArtwork('east-artwork'));
-        document.getElementById('zoneWest').addEventListener('click', () => discoverArtwork('west-artwork'));
-        document.getElementById('zoneNorth').addEventListener('click', () => discoverArtwork('north-artwork'));
-        document.getElementById('zoneSouth').addEventListener('click', () => discoverArtwork('south-artwork'));
-
-        // Zoom functionality (pinch)
+        // Gentle zoom for meditation
         let lastTouchDistance = 0;
         let isZooming = false;
 
@@ -413,6 +400,7 @@
                     Math.pow(touch2.clientX - touch1.clientX, 2) +
                     Math.pow(touch2.clientY - touch1.clientY, 2)
                 );
+                e.preventDefault();
             }
         });
 
@@ -426,7 +414,7 @@
                 );
                 
                 const scale = currentDistance / lastTouchDistance;
-                zoomVisibleModels(scale);
+                gentleZoomAll(scale);
                 lastTouchDistance = currentDistance;
                 e.preventDefault();
             }
@@ -438,72 +426,65 @@
             }
         });
 
-        function zoomVisibleModels(scaleFactor) {
-            Object.keys(artworkConfig).forEach(artworkId => {
-                if (artworkConfig[artworkId].discovered) {
-                    const model = document.getElementById(artworkId);
-                    if (model.getAttribute('visible')) {
-                        const currentScale = model.getAttribute('scale');
-                        const newScale = {
-                            x: Math.max(0.5, Math.min(2.5, currentScale.x * scaleFactor)),
-                            y: Math.max(0.5, Math.min(2.5, currentScale.y * scaleFactor)),
-                            z: Math.max(0.5, Math.min(2.5, currentScale.z * scaleFactor))
-                        };
-                        model.setAttribute('scale', newScale);
-                    }
+        function gentleZoomAll(scaleFactor) {
+            grownSculptures.forEach(sculptureId => {
+                const sculpture = document.getElementById(sculptureId);
+                if (sculpture && sculpture.getAttribute('visible')) {
+                    const currentScale = sculpture.getAttribute('scale');
+                    const newScale = {
+                        x: Math.max(0.5, Math.min(2.0, currentScale.x * scaleFactor)),
+                        y: Math.max(0.5, Math.min(2.0, currentScale.y * scaleFactor)),
+                        z: Math.max(0.5, Math.min(2.0, currentScale.z * scaleFactor))
+                    };
+                    sculpture.setAttribute('scale', newScale);
                 }
             });
         }
 
-        // Reset garden function
-        function resetGarden() {
-            Object.keys(artworkConfig).forEach(artworkId => {
-                const model = document.getElementById(artworkId);
-                model.setAttribute('visible', false);
-                model.setAttribute('scale', '0 0 0');
-                model.setAttribute('src', '');
-                artworkConfig[artworkId].discovered = false;
-            });
+        // Reset for new meditation session
+        function resetMeditation() {
+            const container = document.getElementById('sculpture-container');
+            container.innerHTML = '';
             
-            discoveredCount = 0;
-            loadingPromises.clear();
+            currentArtworkIndex = 0;
+            growthCount = 0;
+            grownSculptures.clear();
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('movementGuide').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Take 2-3 steps and tap to discover sculptures 🌱';
-            document.getElementById('movementGuide').innerHTML = 'Move in small circle • Stay within 1 meter';
+            document.getElementById('tapHint').style.display = 'block';
+            document.getElementById('instructions').innerHTML = 'Breathe deeply. Touch the ground to grow your garden 🌱';
             document.getElementById('completionMessage').style.display = 'none';
         }
 
-        // Shake to reset
+        // Gentle shake to reset
         let shakeTimeout;
         window.addEventListener('devicemotion', function(event) {
             if (event.acceleration && 
-                (Math.abs(event.acceleration.x) > 15 || 
-                 Math.abs(event.acceleration.y) > 15 || 
-                 Math.abs(event.acceleration.z) > 15)) {
+                (Math.abs(event.acceleration.x) > 12 || 
+                 Math.abs(event.acceleration.y) > 12 || 
+                 Math.abs(event.acceleration.z) > 12)) {
                 
                 clearTimeout(shakeTimeout);
-                shakeTimeout = setTimeout(resetGarden, 500);
+                shakeTimeout = setTimeout(resetMeditation, 1000);
             }
         });
 
-        // Prevent context menu on long press
+        // Prevent context menu
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
         });
 
-        // Hide movement guide after 10 seconds
+        // Hide tap hint after initial guidance
         setTimeout(() => {
-            const guide = document.getElementById('movementGuide');
-            if (guide && discoveredCount === 0) {
-                guide.style.opacity = '0.5';
+            const hint = document.getElementById('tapHint');
+            if (hint && growthCount === 0) {
+                hint.style.opacity = '0.3';
                 setTimeout(() => {
-                    guide.style.display = 'none';
-                }, 2000);
+                    hint.style.display = 'none';
+                }, 3000);
             }
-        }, 10000);
+        }, 8000);
     </script>
 </body>
 </html>
