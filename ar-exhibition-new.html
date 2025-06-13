@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Ground First Discovery</title>
+    <title>Gelora - Ground Awareness</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -24,35 +24,6 @@
             z-index: 999;
         }
         
-        .start-instructions {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 30px 40px;
-            border-radius: 30px;
-            text-align: center;
-            font-size: 16px;
-            font-weight: 300;
-            max-width: 80%;
-            backdrop-filter: blur(10px);
-            z-index: 10000;
-            pointer-events: all !important;
-            cursor: pointer !important;
-            user-select: none;
-        }
-        
-        .start-instructions:hover {
-            background: rgba(0,0,0,0.9);
-            transform: translate(-50%, -50%) scale(1.05);
-        }
-        
-        .start-instructions:active {
-            transform: translate(-50%, -50%) scale(0.95);
-        }
-        
         .ground-instructions {
             position: absolute;
             top: 30px;
@@ -66,7 +37,6 @@
             font-size: 10px;
             backdrop-filter: blur(3px);
             font-weight: 300;
-            display: none;
         }
         
         .awareness-counter {
@@ -82,60 +52,55 @@
             backdrop-filter: blur(2px);
         }
         
-        /* Smaller glowing dots positioned at bottom for upward dragging */
+        /* Glowing dots positioned on ground */
         .glowing-dot {
             position: absolute;
-            width: 25px;
-            height: 25px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             pointer-events: all;
             cursor: grab;
             transition: all 0.3s ease;
-            box-shadow: 0 0 15px currentColor;
+            box-shadow: 0 0 20px currentColor;
             border: 2px solid currentColor;
-            opacity: 0;
-            display: none;
+            opacity: 0.8;
         }
         
         .glowing-dot:active {
             cursor: grabbing;
-            transform: scale(1.3);
+            transform: scale(1.2);
         }
         
         .dot-green {
-            background: radial-gradient(circle, rgba(0,255,127,0.7) 0%, rgba(0,255,127,0.3) 70%, transparent 100%);
+            background: radial-gradient(circle, rgba(0,255,127,0.6) 0%, rgba(0,255,127,0.2) 70%, transparent 100%);
             color: rgba(0,255,127,1);
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: pulseGreen 1.5s ease-in-out infinite;
+            top: 40%;
+            right: 15%;
+            animation: pulseGreen 2s ease-in-out infinite;
         }
         
         .dot-pink {
-            background: radial-gradient(circle, rgba(255,20,147,0.7) 0%, rgba(255,20,147,0.3) 70%, transparent 100%);
+            background: radial-gradient(circle, rgba(255,20,147,0.6) 0%, rgba(255,20,147,0.2) 70%, transparent 100%);
             color: rgba(255,20,147,1);
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: pulsePink 1.5s ease-in-out infinite;
+            bottom: 20%;
+            left: 40%;
+            animation: pulsePink 2s ease-in-out infinite;
         }
         
         .dot-white {
-            background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.3) 70%, transparent 100%);
+            background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.2) 70%, transparent 100%);
             color: rgba(255,255,255,1);
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: pulseWhite 1.5s ease-in-out infinite;
+            top: 40%;
+            left: 15%;
+            animation: pulseWhite 2s ease-in-out infinite;
         }
         
         .dot-blue {
-            background: radial-gradient(circle, rgba(173,216,230,0.7) 0%, rgba(173,216,230,0.3) 70%, transparent 100%);
+            background: radial-gradient(circle, rgba(173,216,230,0.6) 0%, rgba(173,216,230,0.2) 70%, transparent 100%);
             color: rgba(173,216,230,1);
-            bottom: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: pulseBlue 1.5s ease-in-out infinite;
+            top: 15%;
+            left: 45%;
+            animation: pulseBlue 2s ease-in-out infinite;
         }
         
         @keyframes pulseGreen {
@@ -158,15 +123,15 @@
             50% { box-shadow: 0 0 30px rgba(173,216,230,1), 0 0 40px rgba(173,216,230,0.6); }
         }
         
-        /* Center target area for upward dragging */
+        /* Center target area */
         .center-target {
             position: absolute;
-            top: 40%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border: 2px dashed rgba(255,255,255,0.4);
+            width: 80px;
+            height: 80px;
+            border: 2px dashed rgba(255,255,255,0.3);
             border-radius: 50%;
             pointer-events: none;
             background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
@@ -198,27 +163,19 @@
     </a-scene>
 
     <div class="overlay">
-        <div class="start-instructions" id="startInstructions">
-            Point your camera toward the ground first<br>
-            <small style="margin-top: 10px; display: block; opacity: 0.8;">Then tap here to begin...</small>
-        </div>
-        
-        <div class="ground-instructions" id="instructions" style="opacity: 0;">
-            Drag green dot to center target
+        <div class="ground-instructions" id="instructions">
+            Drag glowing dots to center
         </div>
         
         <div class="awareness-counter" id="progress">
             <span id="count">0</span>/4
         </div>
         
-        <!-- SEQUENTIAL DOTS - All hidden initially -->
+        <!-- Pre-positioned glowing dots -->
         <div class="glowing-dot dot-green" id="dotGreen"></div>
         <div class="glowing-dot dot-pink" id="dotPink"></div>
         <div class="glowing-dot dot-white" id="dotWhite"></div>
         <div class="glowing-dot dot-blue" id="dotBlue"></div>
-        
-        <!-- Drag trail line -->
-        <div class="drag-line" id="dragLine"></div>
         
         <!-- Center target -->
         <div class="center-target" id="centerTarget"></div>
@@ -230,52 +187,41 @@
     </div>
 
     <script>
-        // Ground awareness configuration - surrounding audience formation
+        // Ground awareness configuration
         const groundMemories = [
             {
                 id: 'east-ground',
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
-                scale: 2.0, // Increased 1.5x from original 1.35
-                position: { x: 2.2, y: -0.5, z: -1.5 }, // Right side, surrounding audience
-                order: 0,
-                color: 'green'
+                scale: 0.9,
+                position: { x: 2.0, y: -0.5, z: -2.0 }
             },
             {
                 id: 'south-ground',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.6,  // Keep smaller as requested
-                position: { x: 0.0, y: -0.5, z: -0.5 }, // Front, surrounding audience
-                order: 1,
-                color: 'pink'
+                scale: 0.6,  // Reduced scale for south piece
+                position: { x: 0.0, y: -0.5, z: -1.0 }
             },
             {
                 id: 'west-ground',
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
-                scale: 2.0, // Increased 1.5x from original 1.35
-                position: { x: -2.2, y: -0.5, z: -1.5 }, // Left side, surrounding audience
-                order: 2,
-                color: 'white'
+                scale: 0.9,
+                position: { x: -2.0, y: -0.5, z: -2.0 }
             },
             {
                 id: 'north-ground',
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
-                scale: 0.9, // Keep original size
-                position: { x: 0.0, y: -0.5, z: -3.0 }, // Behind audience
-                order: 3,
-                color: 'blue'
+                scale: 0.9,
+                position: { x: 0.0, y: -0.5, z: -3.0 }
             }
         ];
 
         let groundCount = 0;
         const awakenedMemories = new Set();
         let draggedDots = new Set();
-        let currentAvailableDot = 0;
-        let experienceStarted = false;
-        let groundCameraDetected = false; // Track which dot should be available
         
         // Get center target position
         function getCenterPosition() {
@@ -287,7 +233,7 @@
             };
         }
         
-        // Check if dot is dragged upward to center target
+        // Check if dot is in center
         function isInCenter(dotElement) {
             const dotRect = dotElement.getBoundingClientRect();
             const dotCenter = {
@@ -301,142 +247,30 @@
                 Math.pow(dotCenter.y - centerPos.y, 2)
             );
             
-            return distance < 40; // Within 40px of center target
-        }
-
-        // FIXED: Simple and reliable tap detection
-        function detectGroundPointing() {
-            if (experienceStarted) return;
-            
-            console.log('Setting up tap detection...');
-            
-            const startButton = document.getElementById('startInstructions');
-            
-            // Multiple event types for maximum compatibility
-            function tryStart(e) {
-                console.log('Tap detected!', e.type);
-                e.preventDefault();
-                e.stopPropagation();
-                startExperience();
-            }
-            
-            // Add all possible events
-            startButton.addEventListener('click', tryStart, { passive: false });
-            startButton.addEventListener('touchstart', tryStart, { passive: false });
-            startButton.addEventListener('touchend', tryStart, { passive: false });
-            startButton.addEventListener('mousedown', tryStart, { passive: false });
-            startButton.addEventListener('mouseup', tryStart, { passive: false });
-            
-            // Backup: global tap anywhere
-            setTimeout(() => {
-                document.addEventListener('click', tryStart, { passive: false, once: true });
-                document.addEventListener('touchstart', tryStart, { passive: false, once: true });
-            }, 100);
-        }
-        
-        function startExperience() {
-            if (experienceStarted) return;
-            
-            experienceStarted = true;
-            console.log('Experience starting - camera pointed to ground');
-            
-            // Hide start instructions with fade out
-            const startInstructions = document.getElementById('startInstructions');
-            startInstructions.style.opacity = '0';
-            startInstructions.style.transition = 'opacity 0.5s ease';
-            
-            setTimeout(() => {
-                startInstructions.style.display = 'none';
-                // Show main instructions
-                document.getElementById('instructions').style.display = 'block';
-                document.getElementById('instructions').style.opacity = '1';
-            }, 500);
-            
-            // Show first green dot after delay
-            setTimeout(() => {
-                showCurrentDot();
-            }, 1000);
-        }
-        
-        // Show only current dot sequentially
-        function showCurrentDot() {
-            if (currentAvailableDot >= groundMemories.length) return;
-            
-            const currentMemory = groundMemories[currentAvailableDot];
-            const currentDot = document.getElementById(currentMemory.dotId);
-            
-            console.log('Showing dot:', currentMemory.dotId);
-            
-            // Make current dot visible with animation
-            currentDot.classList.add('visible');
-            currentDot.style.pointerEvents = 'all';
-            
-            // Update instruction
-            const colorNames = {
-                'green': 'green',
-                'pink': 'pink',
-                'white': 'white', 
-                'blue': 'blue'
-            };
-            document.getElementById('instructions').innerHTML = 
-                `Drag ${colorNames[currentMemory.color]} dot to center target`;
-        }
-        
-        // Hide current dot after successful drag
-        function hideCurrentDot() {
-            if (currentAvailableDot >= groundMemories.length) return;
-            
-            const currentMemory = groundMemories[currentAvailableDot - 1]; // Previous dot
-            const currentDot = document.getElementById(currentMemory.dotId);
-            
-            // Hide the dot with animation
-            currentDot.classList.remove('visible');
-            currentDot.style.pointerEvents = 'none';
-            
-            setTimeout(() => {
-                currentDot.style.display = 'none';
-            }, 500);
-        }
-
-        // Create drag trail line
-        function createDragLine(startX, startY, endX, endY, color) {
-            const line = document.getElementById('dragLine');
-            const length = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
-            const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
-            
-            line.style.left = startX + 'px';
-            line.style.top = startY + 'px';
-            line.style.height = length + 'px';
-            line.style.transform = `rotate(${angle + 90}deg)`;
-            line.style.transformOrigin = '0 0';
-            line.style.background = `linear-gradient(to top, ${color}, transparent)`;
-            line.style.color = color;
-            line.style.opacity = '0.6';
-        }
-
-        // Hide drag line
-        function hideDragLine() {
-            const line = document.getElementById('dragLine');
-            line.style.opacity = '0';
+            return distance < 50; // Within 50px of center
         }
 
         // Drag functionality for each dot
         function makeDraggable(dotElement, memoryConfig) {
             let isDragging = false;
             let startPos = { x: 0, y: 0 };
-            let startDotPos = { x: 0, y: 0 };
+            let currentPos = { x: 0, y: 0 };
+            
+            // Mouse events
+            dotElement.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', endDrag);
+            
+            // Touch events
+            dotElement.addEventListener('touchstart', startDrag, { passive: false });
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('touchend', endDrag);
             
             function startDrag(e) {
-                // Check if this is the current available dot
-                if (memoryConfig.order !== currentAvailableDot || draggedDots.has(dotElement.id)) {
-                    console.log('Drag blocked - not current dot or already dragged');
-                    return;
-                }
+                if (draggedDots.has(dotElement.id)) return;
                 
-                console.log('Starting drag for:', dotElement.id);
                 isDragging = true;
-                dotElement.style.zIndex = '10000 !important';
-                dotElement.style.cursor = 'grabbing';
+                dotElement.style.zIndex = '1000';
                 
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
@@ -445,96 +279,40 @@
                 startPos.x = clientX - rect.left;
                 startPos.y = clientY - rect.top;
                 
-                // Store initial dot position for line drawing
-                startDotPos.x = rect.left + rect.width / 2;
-                startDotPos.y = rect.top + rect.height / 2;
-                
                 e.preventDefault();
-                e.stopPropagation();
             }
             
             function drag(e) {
                 if (!isDragging) return;
                 
-                console.log('Dragging...');
                 const clientX = e.clientX || (e.touches && e.touches[0].clientX);
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 
-                const newX = clientX - startPos.x;
-                const newY = clientY - startPos.y;
+                currentPos.x = clientX - startPos.x;
+                currentPos.y = clientY - startPos.y;
                 
-                // Force position update
-                dotElement.style.position = 'fixed !important';
-                dotElement.style.left = newX + 'px !important';
-                dotElement.style.top = newY + 'px !important';
-                dotElement.style.transform = 'none !important';
-                dotElement.style.bottom = 'auto !important';
-                
-                // Create drag line from start position to current position
-                const currentDotX = clientX;
-                const currentDotY = clientY;
-                
-                // Get dot color for line
-                const color = memoryConfig.color === 'green' ? 'rgba(0,255,127,1)' :
-                             memoryConfig.color === 'pink' ? 'rgba(255,20,147,1)' :
-                             memoryConfig.color === 'white' ? 'rgba(255,255,255,1)' :
-                             'rgba(173,216,230,1)';
-                
-                createDragLine(startDotPos.x, startDotPos.y, currentDotX, currentDotY, color);
+                dotElement.style.left = currentPos.x + 'px';
+                dotElement.style.top = currentPos.y + 'px';
+                dotElement.style.position = 'fixed';
                 
                 e.preventDefault();
-                e.stopPropagation();
             }
             
             function endDrag(e) {
                 if (!isDragging) return;
                 
-                console.log('Ending drag');
                 isDragging = false;
-                dotElement.style.cursor = 'grab';
-                hideDragLine();
+                dotElement.style.zIndex = '999';
                 
-                // Check if dot reached center target
+                // Check if dot reached center
                 if (isInCenter(dotElement)) {
-                    console.log('Dot reached center!');
                     draggedDots.add(dotElement.id);
                     awakenGroundMemory(memoryConfig);
-                    hideCurrentDot(); // Hide current dot
-                    currentAvailableDot++; // Move to next dot
-                    
-                    // Show next dot after 3D piece emerges
-                    setTimeout(() => {
-                        if (currentAvailableDot < groundMemories.length) {
-                            showCurrentDot();
-                        }
-                    }, 3000); // Wait for 3D emergence
-                } else {
-                    console.log('Dot not in center, resetting position');
-                    // Reset position if not successful
-                    dotElement.style.position = 'fixed !important';
-                    dotElement.style.left = '50% !important';
-                    dotElement.style.bottom = '8% !important';
-                    dotElement.style.top = 'auto !important';
-                    dotElement.style.transform = 'translateX(-50%) !important';
+                    hideDot(dotElement);
                 }
                 
                 e.preventDefault();
-                e.stopPropagation();
             }
-            
-            // Remove any existing event listeners first
-            dotElement.removeEventListener('mousedown', startDrag);
-            dotElement.removeEventListener('touchstart', startDrag);
-            
-            // Add event listeners
-            dotElement.addEventListener('mousedown', startDrag, { passive: false });
-            dotElement.addEventListener('touchstart', startDrag, { passive: false });
-            
-            // Add global move and end listeners
-            document.addEventListener('mousemove', drag, { passive: false });
-            document.addEventListener('mouseup', endDrag, { passive: false });
-            document.addEventListener('touchmove', drag, { passive: false });
-            document.addEventListener('touchend', endDrag, { passive: false });
         }
         
         function hideDot(dotElement) {
@@ -548,105 +326,71 @@
         function awakenGroundMemory(memoryConfig) {
             const container = document.getElementById('ground-container');
             
-            // Create memory element starting at center, deep underground
+            // Create ground memory element starting at center
             const memory = document.createElement('a-gltf-model');
             memory.setAttribute('id', memoryConfig.id);
             memory.setAttribute('src', memoryConfig.src);
-            memory.setAttribute('position', '0 -1.5 -1.5'); // Start at center underground
-            memory.setAttribute('scale', '0.05 0.05 0.05'); // Start very tiny for dramatic scaling
-            memory.setAttribute('rotation', '0 0 0');
+            memory.setAttribute('position', '0 -0.8 -1.5'); // Start at center underground
+            memory.setAttribute('scale', '0 0 0');
             memory.setAttribute('visible', false);
             
-            // 3x FASTER emergence from center underground
+            // Center emergence animation - emerge from center first
             memory.setAttribute('animation__center-emerge', 
-                'property: position; from: 0 -1.5 -1.5; to: 0 0.2 -1.5; ' +
-                'dur: 3000; easing: easeOutQuart; startEvents: centerEmerge'
+                'property: position; from: 0 -1.2 -1.5; to: 0 0.1 -1.5; ' +
+                'dur: 15000; easing: easeOutQuart; startEvents: centerEmerge'
             );
             
-            // 3x SLOWER scale growth for dramatic effect
-            memory.setAttribute('animation__dramatic-scale', 
-                `property: scale; from: 0.05 0.05 0.05; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                'dur: 24000; easing: easeOutElastic; startEvents: dramaticScale'
+            // Growing motion while at center
+            memory.setAttribute('animation__center-grow', 
+                `property: scale; from: 0 0 0; to: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
+                'dur: 18000; easing: easeOutElastic; startEvents: centerGrow'
             );
             
-            // Fast swirling while at center
-            memory.setAttribute('animation__center-swirl', 
-                'property: rotation; from: 0 0 0; to: 0 1440 0; ' +
-                'dur: 4000; easing: easeOutQuart; startEvents: centerSwirl'
-            );
-            
-            // Movement to surrounding position after center emergence
-            memory.setAttribute('animation__surround-move', 
+            // Movement to final position after emerging at center
+            memory.setAttribute('animation__move-to-position', 
                 'property: position; ' +
-                `from: 0 0.2 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.2} ${memoryConfig.position.z}; ` +
-                'dur: 5000; easing: easeInOutQuart; startEvents: surroundMove'
+                `from: 0 0.1 -1.5; to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                'dur: 12000; easing: easeInOutQuart; startEvents: moveToPosition'
             );
             
-            // Continue rotation during movement
-            memory.setAttribute('animation__move-swirl', 
-                'property: rotation; from: 0 1440 0; to: 0 1800 0; ' +
-                'dur: 5000; easing: easeInOutQuart; startEvents: moveSwirl'
+            // Gentle life breathing at final position
+            memory.setAttribute('animation__final-breathe', 
+                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.1} ${memoryConfig.position.z}; ` +
+                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.18} ${memoryConfig.position.z}; ` +
+                'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: finalBreathe'
             );
             
-            // FASTER dancing breathing at final position
-            memory.setAttribute('animation__dance-breathe', 
-                `property: position; from: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.2} ${memoryConfig.position.z}; ` +
-                `to: ${memoryConfig.position.x} ${memoryConfig.position.y + 0.4} ${memoryConfig.position.z}; ` +
-                'dir: alternate; dur: 2500; easing: easeInOutSine; loop: true; startEvents: danceBreathe'
-            );
-            
-            // FASTER dancing rotation
-            memory.setAttribute('animation__dance-spin', 
-                'property: rotation; from: 0 1800 0; to: 0 2160 0; ' +
-                'dur: 30000; easing: linear; loop: true; startEvents: danceSpin'
-            );
-            
-            // Additional rhythmic swaying for dance effect
-            memory.setAttribute('animation__dance-sway', 
-                'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
-                'dir: alternate; dur: 3000; easing: easeInOutSine; loop: true; startEvents: danceSway'
-            );
-            
-            // Rhythmic scale breathing for life effect
-            memory.setAttribute('animation__scale-breathing', 
-                `property: scale; from: ${memoryConfig.scale} ${memoryConfig.scale} ${memoryConfig.scale}; ` +
-                `to: ${memoryConfig.scale * 1.05} ${memoryConfig.scale * 1.05} ${memoryConfig.scale * 1.05}; ` +
-                'dir: alternate; dur: 3500; easing: easeInOutSine; loop: true; startEvents: scaleBreathing'
+            // Slow turning for 360° view at final position
+            memory.setAttribute('animation__final-turn', 
+                'property: rotation; from: 0 0 0; to: 0 360 0; ' +
+                'dur: 180000; easing: linear; loop: true; startEvents: finalTurn'
             );
             
             container.appendChild(memory);
             
-            // Timing sequence: center emergence → move to surround → dancing life
+            // Load and show with center-first timing sequence
             memory.addEventListener('model-loaded', function() {
                 // 1. Start at center underground
                 setTimeout(() => {
                     memory.setAttribute('visible', true);
                     memory.emit('centerEmerge');
-                    memory.emit('centerSwirl');
                 }, 500);
                 
-                // 2. Start dramatic scaling while emerging
+                // 2. Grow while emerging at center
                 setTimeout(() => {
-                    memory.emit('dramaticScale');
+                    memory.emit('centerGrow');
                 }, 1000);
                 
-                // 3. Move to surrounding position
+                // 3. Move to final position after center emergence
                 setTimeout(() => {
-                    memory.emit('surroundMove');
-                    memory.emit('moveSwirl');
-                }, 4000); // After center emergence
+                    memory.emit('moveToPosition');
+                }, 16000); // After center emergence completes
                 
-                // 4. Start dancing life motions at final position
+                // 4. Start life motions at final position
                 setTimeout(() => {
-                    memory.emit('danceBreathe');
-                    memory.emit('danceSpin');
-                    memory.emit('danceSway');
-                    memory.emit('scaleBreathing');
-                }, 9000); // After movement to position
-            });
-            
-            memory.addEventListener('model-error', function() {
-                console.log(`Failed to awaken ${memoryConfig.id} from ground`);
+                    memory.emit('finalBreathe');
+                    memory.emit('finalTurn');
+                }, 28000); // After movement completes
             });
             
             awakenedMemories.add(memoryConfig.id);
@@ -664,33 +408,10 @@
                     document.getElementById('centerTarget').style.display = 'none';
                     document.getElementById('groundComplete').style.display = 'block';
                 }, 2000);
-            } else {
-                // Update instruction for current piece
-                const currentMemory = groundMemories[currentAvailableDot];
-                if (currentMemory) {
-                    const instructions = {
-                        'green': 'Drag glowing green dot to center target',
-                        'pink': 'Drag glowing pink dot to center target', 
-                        'white': 'Drag glowing white dot to center target',
-                        'blue': 'Drag glowing blue dot to center target'
-                    };
-                    document.getElementById('instructions').innerHTML = instructions[currentMemory.color];
-                }
-            }
-        }': 'pink', 
-                        'dotWhite': 'white',
-                        'dotBlue': 'blue'
-                    };
-                    const nextColor = colorNames[nextPiece.dotId];
-                    document.getElementById('instructions').innerHTML = `Drag ${nextColor} dot to center`;
-                }
             }
         }
 
-        // Initialize ground detection
-        detectGroundPointing();
-        
-        // Initialize draggable dots (all hidden initially)
+        // Initialize draggable dots
         groundMemories.forEach(memory => {
             const dot = document.getElementById(memory.dotId);
             makeDraggable(dot, memory);
@@ -756,13 +477,12 @@
             container.innerHTML = '';
             
             groundCount = 0;
-            currentAvailableDot = 0; // Reset to first dot
             awakenedMemories.clear();
             draggedDots.clear();
             
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Drag green dot to center';
+            document.getElementById('instructions').innerHTML = 'Drag glowing dots to center';
             document.getElementById('centerTarget').style.display = 'block';
             document.getElementById('groundComplete').style.display = 'none';
             
@@ -770,21 +490,10 @@
             groundMemories.forEach(memory => {
                 const dot = document.getElementById(memory.dotId);
                 dot.style.display = 'block';
+                dot.style.opacity = '0.8';
                 dot.style.pointerEvents = 'all';
                 dot.style.position = 'absolute';
                 dot.style.zIndex = '999';
-                
-                // Reset to original positions
-                dot.style.left = '';
-                dot.style.top = '';
-                
-                // Only first dot available initially
-                if (memory.order === 0) {
-                    dot.style.opacity = '0.8';
-                } else {
-                    dot.style.opacity = '0.3';
-                    dot.style.pointerEvents = 'none';
-                }
             });
         }
 
