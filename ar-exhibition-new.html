@@ -490,10 +490,10 @@
                     memory.emit('moveToFinal');
                 }, emergeDuration + 1000);
                 
-                // Start final elemental motion + enable vertical dragging
+                // Start final elemental motion + enable interaction
                 setTimeout(() => {
                     memory.emit('finalMotion');
-                    enableVerticalDragging(memory);
+                    enableGeloraInteraction(memory);
                 }, emergeDuration + 9000);
             });
             
@@ -514,71 +514,114 @@
             }
         }
 
-        // Vertical dragging for Geloras
-        function enableVerticalDragging(memory) {
+        // Simple vertical dragging and double-tap for Geloras
+        function enableGeloraInteraction(memory) {
             let isDragging = false;
             let startY = 0;
-            let startPosition = { x: 0, y: 0, z: 0 };
+            let originalY = 0;
+            let lastTapTime = 0;
+            let tapCount = 0;
             
-            // Add visual feedback - make it slightly larger when touched
-            memory.addEventListener('mousedown', startDrag);
-            memory.addEventListener('touchstart', startDrag, { passive: false });
+            // Make the Gelora interactive by adding raycaster target
+            memory.setAttribute('class', 'interactive');
             
-            function startDrag(e) {
-                isDragging = true;
+            // Touch/Mouse start
+            memory.addEventListener('mousedown', startInteraction);
+            memory.addEventListener('touchstart', startInteraction, { passive: false });
+            
+            function startInteraction(e) {
+                const currentTime = Date.now();
                 
+                // Get Y coordinate
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
                 startY = clientY;
                 
-                // Get starting position
-                const position = memory.getAttribute('position');
-                startPosition = { x: position.x, y: position.y, z: position.z };
+                // Get current position
+                const pos = memory.getAttribute('position');
+                originalY = pos.y;
                 
-                // Visual feedback - slightly enlarge
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x * 1.05} ${currentScale.y * 1.05} ${currentScale.z * 1.05}`);
+                // Start drag detection
+                isDragging = false;
                 
                 e.preventDefault();
                 e.stopPropagation();
             }
             
-            document.addEventListener('mousemove', dragVertically);
-            document.addEventListener('touchmove', dragVertically, { passive: false });
+            // Touch/Mouse move
+            document.addEventListener('mousemove', handleMove);
+            document.addEventListener('touchmove', handleMove, { passive: false });
             
-            function dragVertically(e) {
-                if (!isDragging) return;
+            function handleMove(e) {
+                if (startY === 0) return; // No active touch
                 
                 const clientY = e.clientY || (e.touches && e.touches[0].clientY);
-                const deltaY = startY - clientY; // Invert so up drag moves up
+                const deltaY = startY - clientY;
                 
-                // Convert drag distance to world units (adjust sensitivity)
-                const sensitivity = 0.002;
-                const newY = startPosition.y + (deltaY * sensitivity);
-                
-                // Limit vertical movement range (prevent going too high or low)
-                const minY = startPosition.y - 1.0; // 1 unit below start
-                const maxY = startPosition.y + 1.5; // 1.5 units above start
-                const clampedY = Math.max(minY, Math.min(maxY, newY));
-                
-                // Update position
-                memory.setAttribute('position', `${startPosition.x} ${clampedY} ${startPosition.z}`);
+                // If moved more than 10px, it's a drag
+                if (Math.abs(deltaY) > 10) {
+                    isDragging = true;
+                    
+                    // Update vertical position
+                    const sensitivity = 0.005;
+                    const newY = originalY + (deltaY * sensitivity);
+                    
+                    // Clamp to reasonable range
+                    const clampedY = Math.max(originalY - 1.5, Math.min(originalY + 1.5, newY));
+                    
+                    // Update position
+                    const pos = memory.getAttribute('position');
+                    memory.setAttribute('position', `${pos.x} ${clampedY} ${pos.z}`);
+                }
                 
                 e.preventDefault();
             }
             
-            document.addEventListener('mouseup', endDrag);
-            document.addEventListener('touchend', endDrag);
+            // Touch/Mouse end
+            document.addEventListener('mouseup', endInteraction);
+            document.addEventListener('touchend', endInteraction);
             
-            function endDrag(e) {
-                if (!isDragging) return;
+            function endInteraction(e) {
+                if (startY === 0) return; // No active interaction
                 
+                // If it wasn't a drag, treat as tap
+                if (!isDragging) {
+                    handleTap();
+                }
+                
+                // Reset
                 isDragging = false;
-                
-                // Return to normal scale
-                const currentScale = memory.getAttribute('scale');
-                memory.setAttribute('scale', `${currentScale.x / 1.05} ${currentScale.y / 1.05} ${currentScale.z / 1.05}`);
+                startY = 0;
+                originalY = 0;
                 
                 e.preventDefault();
+            }
+            
+            function handleTap() {
+                tapCount++;
+                
+                if (tapCount === 1) {
+                    // Wait for potential second tap
+                    setTimeout(() => {
+                        if (tapCount === 1) {
+                            // Single tap - do nothing or add single tap action
+                            tapCount = 0;
+                        }
+                    }, 300);
+                } else if (tapCount === 2) {
+                    // Double tap detected!
+                    tapCount = 0;
+                    rotateGelora(memory);
+                }
+            }
+            
+            function rotateGelora(memory) {
+                const rotation = memory.getAttribute('rotation');
+                const newRotationY = rotation.y + 90;
+                
+                // Simple direct rotation update
+                memory.setAttribute('rotation', `${rotation.x} ${newRotationY} ${rotation.z}`);
+                
+                console.log('Gelora rotated 90 degrees'); // Debug log
             }
         }
 
