@@ -264,7 +264,7 @@
             return distance < 50;
         }
 
-        // Apply elemental-specific animations and breathing patterns
+        // Apply elemental-specific animations based on element type
         function applyElementalMotion(memory, elementType, scale) {
             switch(elementType) {
                 case 'wood':
@@ -289,12 +289,6 @@
                     memory.setAttribute('animation__wood-sway', 
                         'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
-                    );
-                    
-                    // WOOD BREATHING: Deep, slow expansion like tree growth cycles
-                    memory.setAttribute('animation__wood-breathe', 
-                        `property: scale; from: ${scale * 0.94} ${scale * 0.94} ${scale * 0.94}; to: ${scale * 1.06} ${scale * 1.06} ${scale * 1.06}; ` +
-                        'dir: alternate; dur: 6000; easing: easeInOutQuart; loop: true; startEvents: startBreathing'
                     );
                     break;
 
@@ -321,19 +315,10 @@
                         'dur: 8000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     
-                    // Fire heartbeat-like pulsing
+                    // Slower heartbeat-like pulsing (like breathing heart)
                     memory.setAttribute('animation__fire-heartbeat', 
                         `property: scale; from: ${scale * 0.95} ${scale * 0.95} ${scale * 0.95}; to: ${scale * 1.05} ${scale * 1.05} ${scale * 1.05}; ` +
                         'dir: alternate; dur: 1800; easing: easeInOutSine; loop: true; startEvents: finalMotion'
-                    );
-                    
-                    // FIRE BREATHING: Quick, intense bursts like flames flickering (position only)
-                    // Removed scale breathing to avoid conflict with heartbeat animation
-                    
-                    // Fire breathing with slight position flicker
-                    memory.setAttribute('animation__fire-breathe-flicker', 
-                        'property: position; from: 0 -0.02 0; to: 0 0.02 0; ' +
-                        'dir: alternate; dur: 800; easing: easeInOutSine; loop: true; startEvents: startBreathing'
                     );
                     break;
 
@@ -360,18 +345,6 @@
                         'property: rotation; from: -10 0 0; to: 10 0 0; ' +
                         'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
-                    
-                    // METAL BREATHING: Precise, mechanical expansion like crystalline structure
-                    memory.setAttribute('animation__metal-breathe', 
-                        `property: scale; from: ${scale * 0.96} ${scale * 0.96} ${scale * 0.96}; to: ${scale * 1.04} ${scale * 1.04} ${scale * 1.04}; ` +
-                        'dir: alternate; dur: 3000; easing: easeInOutCubic; loop: true; startEvents: startBreathing'
-                    );
-                    
-                    // Metal breathing with geometric precision - slight angular shift
-                    memory.setAttribute('animation__metal-breathe-angle', 
-                        'property: rotation; from: 0 -1 0; to: 0 1 0; ' +
-                        'dir: alternate; dur: 4500; easing: easeInOutCubic; loop: true; startEvents: startBreathing'
-                    );
                     break;
 
                 case 'water':
@@ -396,21 +369,6 @@
                     memory.setAttribute('animation__water-undulate', 
                         'property: position; from: 0 0.1 -1.5; to: 0 0.25 -1.5; ' +
                         'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
-                    );
-                    
-                    // WATER BREATHING: Fluid, wave-like breathing (position and rotation only)
-                    // Removed scale breathing to keep focus on flowing movements
-                    
-                    // Water breathing with gentle vertical flow
-                    memory.setAttribute('animation__water-breathe-flow', 
-                        'property: position; from: 0 -0.03 0; to: 0 0.03 0; ' +
-                        'dir: alternate; dur: 3500; easing: easeInOutSine; loop: true; startEvents: startBreathing'
-                    );
-                    
-                    // Water breathing with subtle rotation wave
-                    memory.setAttribute('animation__water-breathe-wave', 
-                        'property: rotation; from: 0 0 -2; to: 0 0 2; ' +
-                        'dir: alternate; dur: 5000; easing: easeInOutSine; loop: true; startEvents: startBreathing'
                     );
                     break;
             }
@@ -537,11 +495,6 @@
                     memory.emit('finalMotion');
                     enableDoubleTapRotation(memory);
                 }, emergeDuration + 9000);
-                
-                // Start breathing motion after settling in final position
-                setTimeout(() => {
-                    memory.emit('startBreathing');
-                }, emergeDuration + 10000);
             });
             
             awakenedMemories.add(memoryConfig.id);
