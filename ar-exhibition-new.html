@@ -29,28 +29,28 @@
             top: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.5);
-            color: rgba(255,255,255,0.9);
-            padding: 15px 25px;
-            border-radius: 25px;
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
             text-align: center;
-            font-size: 12px;
-            max-width: 60%;
-            backdrop-filter: blur(5px);
+            font-size: 11px;
+            max-width: 50%;
+            backdrop-filter: blur(3px);
             font-weight: 300;
         }
         
         .position-guide {
             position: absolute;
-            top: 110px;
+            top: 80px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            padding: 8px 15px;
-            border-radius: 15px;
-            font-size: 10px;
-            backdrop-filter: blur(3px);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 9px;
+            backdrop-filter: blur(2px);
             font-weight: 300;
             text-align: center;
         }
@@ -71,13 +71,13 @@
             position: absolute;
             top: 90px;
             right: 30px;
-            background: rgba(0,0,0,0.6);
-            color: rgba(255,255,255,0.8);
-            padding: 8px 12px;
-            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            color: rgba(255,255,255,0.7);
+            padding: 6px 10px;
+            border-radius: 10px;
             font-weight: 300;
-            font-size: 11px;
-            backdrop-filter: blur(3px);
+            font-size: 10px;
+            backdrop-filter: blur(2px);
         }
         
         /* Colored discovery pulses for each direction */
@@ -148,14 +148,14 @@
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
-            color: rgba(255,255,255,0.9);
-            padding: 20px 30px;
-            border-radius: 25px;
-            font-size: 13px;
+            background: rgba(0,0,0,0.4);
+            color: rgba(255,255,255,0.8);
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 11px;
             display: none;
             text-align: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(3px);
             font-weight: 300;
         }
         
@@ -164,12 +164,12 @@
             bottom: 80px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.7);
-            padding: 8px 16px;
-            border-radius: 15px;
-            font-size: 10px;
-            backdrop-filter: blur(3px);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.5);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 8px;
+            backdrop-filter: blur(2px);
             font-weight: 300;
         }
     </style>
@@ -184,11 +184,11 @@
 
     <div class="overlay">
         <div class="zen-instructions" id="instructions">
-            Touch anywhere to plant your Gelora sculpture 🌱
+            Touch to plant Gelora
         </div>
         
         <div class="position-guide" id="positionGuide">
-            Gelora sculptures grow exactly where you touch
+            Each tap creates new position
         </div>
         
         <div class="progress-counter" id="progress">
@@ -196,7 +196,7 @@
         </div>
         
         <div class="tap-hint" id="tapHint">
-            Tap anywhere on the ground plane
+            Tap anywhere on ground
         </div>
         
         <!-- Full-screen tap surface -->
@@ -209,8 +209,8 @@
         <div class="discovery-pulse pulse-north" id="pulseNorth"></div>
         
         <div class="completion-message" id="completionMessage">
-            ✨ Your Gelora garden is complete ✨<br>
-            <small>Breathe and observe • Shake to begin anew</small>
+            Gelora garden complete<br>
+            <small>Shake to reset</small>
         </div>
     </div>
 
@@ -262,15 +262,12 @@
             
             // Project ray from camera to ground plane
             const cameraPos = camera.object3D.position;
-            const cameraRot = camera.object3D.rotation;
             
-            // Calculate ground intersection (Y = -0.5)
+            // Calculate world position where tap occurred with proper scaling
+            const distance = 2.0; // Fixed distance for consistent placement
+            const worldX = cameraPos.x + (x * distance);
+            const worldZ = cameraPos.z - distance;
             const groundY = -0.5;
-            const rayLength = Math.abs((cameraPos.y - groundY) / Math.sin(cameraRot.x || -0.2));
-            
-            // Calculate world position where tap occurred
-            const worldX = cameraPos.x + (x * rayLength * 0.4);
-            const worldZ = cameraPos.z - (rayLength * 0.9);
             
             return {
                 x: Math.max(-3, Math.min(3, worldX)),
@@ -327,7 +324,7 @@
             sculpture.setAttribute('scale', '0 0 0');
             sculpture.setAttribute('visible', false);
             
-            // Add ultra-slow, deeply meditative growth animations
+            // Add ultra-slow, deeply meditative growth animations with gentle motion
             sculpture.setAttribute('animation__emerge', 
                 'property: position; ' +
                 `from: ${position.x} ${position.y - 1.2} ${position.z}; ` +
@@ -340,15 +337,23 @@
                 'dur: 60000; easing: easeOutElastic; startEvents: grow'
             );
             
+            // Gentle breathing motion - slower and more subtle
             sculpture.setAttribute('animation__breathe', 
                 `property: position; from: ${position.x} ${position.y + 0.05} ${position.z}; ` +
-                `to: ${position.x} ${position.y + 0.08} ${position.z}; ` +
-                'dir: alternate; dur: 24000; easing: easeInOutSine; loop: true; startEvents: breathe'
+                `to: ${position.x} ${position.y + 0.12} ${position.z}; ` +
+                'dir: alternate; dur: 18000; easing: easeInOutSine; loop: true; startEvents: breathe'
             );
             
+            // Very gentle rotation - barely noticeable but alive
             sculpture.setAttribute('animation__gentle-turn', 
-                'property: rotation; to: 0 15 0; ' +
-                'dur: 240000; easing: easeInOutSine; startEvents: turn'
+                'property: rotation; from: 0 0 0; to: 0 45 0; ' +
+                'dur: 300000; easing: easeInOutSine; loop: true; startEvents: turn'
+            );
+            
+            // Add subtle scale breathing for life-like feeling
+            sculpture.setAttribute('animation__scale-breathe', 
+                'property: scale; from: 0.8 0.8 0.8; to: 0.82 0.82 0.82; ' +
+                'dir: alternate; dur: 20000; easing: easeInOutSine; loop: true; startEvents: scaleBreathe'
             );
             
             container.appendChild(sculpture);
@@ -367,6 +372,7 @@
                 setTimeout(() => {
                     sculpture.emit('breathe');
                     sculpture.emit('turn');
+                    sculpture.emit('scaleBreathe');
                 }, 30000);
             });
             
@@ -396,17 +402,17 @@
             const instructions = document.getElementById('instructions');
             const positionGuide = document.getElementById('positionGuide');
             const messages = [
-                "Touch anywhere to plant your Gelora sculpture 🌱",
-                "Feel the slow growth. Three more Gelora pieces await 🌿",
-                "Breathe deeply. Two Gelora sculptures remain 🌸",
-                "One final touch to complete your Gelora garden 🌺"
+                "Touch to plant Gelora",
+                "Three more await",
+                "Two pieces remain",
+                "Final placement"
             ];
             
             const guides = [
-                "Gelora sculptures grow exactly where you touch",
-                "Each Gelora piece takes 1 minute to fully emerge",
-                "Watch the gentle, meditative Gelora growth",
-                "Final Gelora sculpture will bloom slowly"
+                "Each tap creates new position",
+                "Sculptures grow independently",
+                "Watch gentle motion",
+                "Complete your space"
             ];
             
             if (growthCount < messages.length) {
@@ -481,8 +487,8 @@
             document.getElementById('count').textContent = '0';
             document.getElementById('instructions').style.display = 'block';
             document.getElementById('tapHint').style.display = 'block';
-            document.getElementById('instructions').innerHTML = 'Touch anywhere to plant your Gelora sculpture 🌱';
-            document.getElementById('positionGuide').innerHTML = 'Gelora sculptures grow exactly where you touch';
+            document.getElementById('instructions').innerHTML = 'Touch to plant Gelora';
+            document.getElementById('positionGuide').innerHTML = 'Each tap creates new position';
             document.getElementById('completionMessage').style.display = 'none';
         }
 
