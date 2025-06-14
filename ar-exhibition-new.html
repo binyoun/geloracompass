@@ -210,7 +210,7 @@
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.48, // Reduced from 0.6 to 0.48 (0.6 * 0.8)
-                position: { x: -0.8, y: -0.6, z: -0.5 }, // Moved from x: -1.2 to x: -0.8 for spacing
+                position: { x: -0.3, y: -0.6, z: -0.8 }, // Moved closer to center and adjusted z for better spacing
                 motionType: 'energetic-burst'
             },
             {
@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.2, y: -0.7, z: -2.5 },
+                position: { x: -2.8, y: -0.7, z: -2.2 }, // Moved further left and adjusted z for clear separation
                 motionType: 'crystalline-precise'
             },
             {
@@ -290,6 +290,19 @@
                         'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
+                    
+                    // Organic breathing - slow vertical movement like tree growth
+                    memory.setAttribute('animation__wood-breathe-y', 
+                        'property: position; from: ' + memoryConfig.position.x + ' ' + (memoryConfig.position.y + 0.05) + ' ' + memoryConfig.position.z + 
+                        '; to: ' + memoryConfig.position.x + ' ' + (memoryConfig.position.y + 0.15) + ' ' + memoryConfig.position.z + '; ' +
+                        'dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Gentle organic breathing scale - like seasonal expansion
+                    memory.setAttribute('animation__wood-breathe-scale', 
+                        `property: scale; from: ${scale * 0.98} ${scale * 0.96} ${scale * 0.98}; to: ${scale * 1.02} ${scale * 1.04} ${scale * 1.02}; ` +
+                        'dir: alternate; dur: 7000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
                     break;
 
                 case 'fire':
@@ -344,6 +357,19 @@
                     memory.setAttribute('animation__metal-tilt', 
                         'property: rotation; from: -10 0 0; to: 10 0 0; ' +
                         'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Crystalline breathing - precise vertical oscillation
+                    memory.setAttribute('animation__metal-breathe-y', 
+                        'property: position; from: ' + memoryConfig.position.x + ' ' + (memoryConfig.position.y + 0.02) + ' ' + memoryConfig.position.z + 
+                        '; to: ' + memoryConfig.position.x + ' ' + (memoryConfig.position.y + 0.12) + ' ' + memoryConfig.position.z + '; ' +
+                        'dir: alternate; dur: 4000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Geometric breathing scale - crystalline expansion/contraction
+                    memory.setAttribute('animation__metal-breathe-scale', 
+                        `property: scale; from: ${scale * 0.97} ${scale * 0.95} ${scale * 0.97}; to: ${scale * 1.03} ${scale * 1.05} ${scale * 1.03}; ` +
+                        'dir: alternate; dur: 5000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     break;
 
