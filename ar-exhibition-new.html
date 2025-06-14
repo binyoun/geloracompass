@@ -201,7 +201,7 @@
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.2, y: -0.8, z: -1.8 },
+                position: { x: 2.0, y: -1.8, z: -1.8 },
                 motionType: 'organic-growth'
             },
             {
@@ -210,7 +210,7 @@
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.48, // Reduced from 0.6 to 0.48 (0.6 * 0.8)
-                position: { x: -1.2, y: -0.6, z: -1.0 }, // Moved LEFT (x: -0.8 to -1.2) and BACK (z: -0.5 to -1.0)
+                position: { x: -1.8, y: -1.6, z: -0.9 }, // Moved from x: -1.2 to x: -0.8 for spacing
                 motionType: 'energetic-burst'
             },
             {
@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -1.7, y: -0.7, z: -2.5 }, // Updated from x: -2.2 to x: -1.7 (+0.5)
+                position: { x: -1.0, y: -1.2, z: -2.5 }, // Updated from x: -2.2 to x: -1.7 (+0.5)
                 motionType: 'crystalline-precise'
             },
             {
@@ -228,7 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.7, z: -3.8 },
+                position: { x: 1.5, y: -1.2, z: -3.8 },
                 motionType: 'fluid-flow'
             }
         ];
@@ -271,24 +271,24 @@
                     // WOOD: Slow, organic growth like a tree
                     memory.setAttribute('animation__wood-emerge', 
                         'property: position; from: 0 -1.0 -1.5; to: 0 0.2 -1.5; ' +
-                        'dur: 4000; easing: easeOutQuart; startEvents: emergeAtCenter'
+                        'dur: 2000; easing: easeOutQuart; startEvents: emergeAtCenter'
                     );
                     
                     memory.setAttribute('animation__wood-grow', 
                         `property: scale; from: 0.01 0.01 0.01; to: ${scale} ${scale} ${scale}; ` +
-                        'dur: 15000; easing: easeOutElastic; startEvents: growAtCenter'
+                        'dur: 5000; easing: easeOutElastic; startEvents: growAtCenter'
                     );
                     
                     // Slow, organic 360-degree rotation like seasonal growth
                     memory.setAttribute('animation__wood-rotate360', 
                         'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                        'dur: 25000; easing: linear; loop: true; startEvents: finalMotion'
+                        'dur: 15000; easing: linear; loop: true; startEvents: finalMotion'
                     );
                     
                     // Gentle tree swaying (z-axis)
                     memory.setAttribute('animation__wood-sway', 
                         'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
-                        'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                        'dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
 
@@ -326,24 +326,24 @@
                     // METAL: Crystalline, geometric precision
                     memory.setAttribute('animation__metal-crystallize', 
                         'property: position; from: 0 -1.0 -1.5; to: 0 0.1 -1.5; ' +
-                        'dur: 2000; easing: easeOutCubic; startEvents: emergeAtCenter'
+                        'dur: 1000; easing: easeOutCubic; startEvents: emergeAtCenter'
                     );
                     
                     memory.setAttribute('animation__metal-form', 
                         `property: scale; from: 0.01 0.01 0.01; to: ${scale} ${scale} ${scale}; ` +
-                        'dur: 2500; easing: easeOutCubic; startEvents: growAtCenter'
+                        'dur: 1500; easing: easeOutCubic; startEvents: growAtCenter'
                     );
                     
                     // Precise, mechanical 360-degree rotation with pauses
                     memory.setAttribute('animation__metal-rotate360', 
                         'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                        'dur: 12000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                        'dur: 8000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     
                     // Additional geometric tilt rotation (x-axis)
                     memory.setAttribute('animation__metal-tilt', 
                         'property: rotation; from: -10 0 0; to: 10 0 0; ' +
-                        'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                        'dir: alternate; dur: 1000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     break;
 
