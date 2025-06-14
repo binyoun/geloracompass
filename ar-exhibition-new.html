@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora - Awareness</title>
+    <title>Gelora:Embodied Alienation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -193,7 +193,7 @@
     </div>
 
     <script>
-        // Elemental configuration with unique motions for each element
+        // Elemental configuration with updated positions and breathing motion
         const elementalMemories = [
             {
                 id: 'wood-gelora',
@@ -209,8 +209,8 @@
                 element: 'fire',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.48, // Reduced from 0.6 to 0.48 (0.6 * 0.8)
-                position: { x: -0.8, y: -0.6, z: -0.5 }, // Moved from x: -1.2 to x: -0.8 for spacing
+                scale: 0.48,
+                position: { x: -0.3, y: -0.6, z: -0.5 }, // Moved from x: -0.8 to x: -0.3 (+0.5) for better spacing
                 motionType: 'energetic-burst'
             },
             {
@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -1.7, y: -0.7, z: -2.5 }, // Updated from x: -2.2 to x: -1.7 (+0.5)
+                position: { x: -2.5, y: -0.7, z: -2.5 }, // Moved from x: -1.7 to x: -2.5 (-0.8) for better spacing
                 motionType: 'crystalline-precise'
             },
             {
@@ -228,7 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.7, z: -3.8 },
+                position: { x: 1.5, y: -0.84, z: -3.8 }, // Lowered from y: -0.7 to y: -0.84 (20% lower)
                 motionType: 'fluid-flow'
             }
         ];
@@ -285,10 +285,16 @@
                         'dur: 25000; easing: linear; loop: true; startEvents: finalMotion'
                     );
                     
-                    // Gentle tree swaying (z-axis)
+                    // Enhanced breathing motion for wood - gentle tree swaying (z-axis)
                     memory.setAttribute('animation__wood-sway', 
                         'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
                         'dir: alternate; dur: 4000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Additional breathing scale motion for wood (organic growth-like breathing)
+                    memory.setAttribute('animation__wood-breathe', 
+                        `property: scale; from: ${scale * 0.98} ${scale * 0.98} ${scale * 0.98}; to: ${scale * 1.02} ${scale * 1.02} ${scale * 1.02}; ` +
+                        'dir: alternate; dur: 6000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
 
@@ -340,10 +346,22 @@
                         'dur: 12000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     
-                    // Additional geometric tilt rotation (x-axis)
+                    // Enhanced breathing motion for metal - geometric tilt rotation (x-axis)
                     memory.setAttribute('animation__metal-tilt', 
                         'property: rotation; from: -10 0 0; to: 10 0 0; ' +
                         'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Additional crystalline breathing scale motion for metal
+                    memory.setAttribute('animation__metal-breathe', 
+                        `property: scale; from: ${scale * 0.97} ${scale * 0.97} ${scale * 0.97}; to: ${scale * 1.03} ${scale * 1.03} ${scale * 1.03}; ` +
+                        'dir: alternate; dur: 8000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                    );
+                    
+                    // Additional subtle side-to-side motion for metal
+                    memory.setAttribute('animation__metal-sway', 
+                        'property: rotation; from: 0 0 -2; to: 0 0 2; ' +
+                        'dir: alternate; dur: 10000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
 
