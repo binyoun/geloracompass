@@ -193,8 +193,7 @@
     </div>
 
     <script>
-        // Elemental configuration with rhythmic spacing - arranged in a harmonious pattern
-        // Using golden ratio and fibonacci spacing principles for visual rhythm
+        // Elemental configuration with unique motions for each element
         const elementalMemories = [
             {
                 id: 'wood-gelora',
@@ -202,8 +201,7 @@
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                // RIGHT FRONT - Closest and largest presence
-                position: { x: 1.6, y: -0.5, z: -2.1 },
+                position: { x: 2.2, y: -0.8, z: -1.8 },
                 motionType: 'organic-growth'
             },
             {
@@ -211,9 +209,8 @@
                 element: 'fire',
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
-                scale: 0.48,
-                // LEFT MIDDLE - Mid-distance, elevated for dynamic presence
-                position: { x: -1.3, y: -0.3, z: -2.8 },
+                scale: 0.48, // Reduced from 0.6 to 0.48 (0.6 * 0.8)
+                position: { x: -1.2, y: -0.6, z: -1.0 }, // Moved LEFT (x: -0.8 to -1.2) and BACK (z: -0.5 to -1.0)
                 motionType: 'energetic-burst'
             },
             {
@@ -222,8 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                // LEFT BACK - Furthest, creating depth perspective
-                position: { x: -0.8, y: -0.6, z: -4.2 },
+                position: { x: -1.7, y: -0.7, z: -2.5 }, // Updated from x: -2.2 to x: -1.7 (+0.5)
                 motionType: 'crystalline-precise'
             },
             {
@@ -232,8 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                // RIGHT BACK - Diagonal depth, balanced composition
-                position: { x: 2.1, y: -0.4, z: -3.5 },
+                position: { x: 1.5, y: -0.7, z: -3.8 },
                 motionType: 'fluid-flow'
             }
         ];
