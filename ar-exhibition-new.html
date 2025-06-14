@@ -228,7 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.75, y: -1.0, z: -2.8 },
+                position: { x: 1.8, y: -1.0, z: -2.8 },
                 motionType: 'fluid-flow'
             }
         ];
@@ -271,7 +271,7 @@
                     // WOOD: Slow, organic growth like a tree
                     memory.setAttribute('animation__wood-emerge', 
                         'property: position; from: 0 -1.0 -1.5; to: 0 1.8 -1.5; ' +
-                        'dur: 2000; easing: easeOutQuart; startEvents: emergeAtCenter'
+                        'dur: 9000; easing: easeOutQuart; startEvents: emergeAtCenter'
                     );
                     
                     memory.setAttribute('animation__wood-grow', 
@@ -282,12 +282,12 @@
                     // Slow, organic 360-degree rotation like seasonal growth
                     memory.setAttribute('animation__wood-rotate360', 
                         'property: rotation; from: 0 0 0; to: 0 360 0; ' +
-                        'dur: 1000; easing: linear; loop: true; startEvents: finalMotion'
+                        'dur: 8000; easing: linear; loop: true; startEvents: finalMotion'
                     );
                     
                     // Gentle tree swaying (z-axis)
                     memory.setAttribute('animation__wood-sway', 
-                        'property: rotation; from: 0 0 -3; to: 0 0 3; ' +
+                        'property: rotation; from: 0 0 -3; to: 1 1 3; ' +
                         'dir: alternate; dur: 2000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
@@ -300,12 +300,12 @@
                     );
                     
                     memory.setAttribute('animation__fire-explode', 
-                        `property: scale; from: 0.01 0.01 0.01; to: ${scale * 2.3} ${scale * 2.3} ${scale * 2.3}; ` +
+                        `property: scale; from: 0.01 0.01 0.01; to: ${scale * 3.3} ${scale * 3.3} ${scale * 3.3}; ` +
                         'dur: 800; easing: easeOutBack; startEvents: growAtCenter'
                     );
                     
                     memory.setAttribute('animation__fire-settle', 
-                        `property: scale; from: ${scale * 2.3} ${scale * 2.3} ${scale * 2.3}; to: ${scale} ${scale} ${scale}; ` +
+                        `property: scale; from: ${scale * 3.3} ${scale * 3.3} ${scale * 3.3}; to: ${scale} ${scale} ${scale}; ` +
                         'dur: 600; easing: easeInQuart; startEvents: settleScale'
                     );
                     
@@ -351,7 +351,7 @@
                     // WATER: Fluid, wave-like emergence
                     memory.setAttribute('animation__water-flow', 
                         'property: position; from: 0 -3.0 -1.5; to: 0 0.15 -1.5; ' +
-                        'dur: 3000; easing: easeOutElastic; startEvents: emergeAtCenter'
+                        'dur: 5000; easing: easeOutElastic; startEvents: emergeAtCenter'
                     );
                     
                     memory.setAttribute('animation__water-ripple', 
