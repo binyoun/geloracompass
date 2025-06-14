@@ -270,7 +270,7 @@
                 case 'wood':
                     // WOOD: Slow, organic growth like a tree
                     memory.setAttribute('animation__wood-emerge', 
-                        'property: position; from: 0 -1.0 -1.5; to: 0 1.8 -1.5; ' +
+                        'property: position; from: 0 -1.0 -1.5; to: 0 0.2 -1.5; ' +
                         'dur: 4000; easing: easeOutQuart; startEvents: emergeAtCenter'
                     );
                     
@@ -294,7 +294,7 @@
                     // Organic x-axis swaying like tree branches in wind
                     memory.setAttribute('animation__wood-drift', 
                         'property: position; from: 2.0 -0.7 -1.8; to: 1.5 -0.7 -1.8; ' +
-                        'dir: alternate; dur: 12000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
+                        'dir: alternate; dur: 10000; easing: easeInOutSine; loop: true; startEvents: finalMotion'
                     );
                     break;
                     
@@ -355,8 +355,8 @@
                     
                     // Precise x-axis sliding movement like crystalline shifting
                     memory.setAttribute('animation__metal-slide', 
-                        'property: position; from: -1.0 -0.6 -2.5; to: 1.0 -0.6 -2.5; ' +
-                        'dir: alternate; dur: 3000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
+                        'property: position; from: -2.0 -0.6 -2.5; to: 1.0 -0.6 -2.5; ' +
+                        'dir: alternate; dur: 6000; easing: easeInOutCubic; loop: true; startEvents: finalMotion'
                     );
                     break;
                     
