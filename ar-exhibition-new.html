@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -1.7, y: -0.7, z: -2.5 }, // Updated from x: -2.2 to x: -1.7 (+0.5)
+                position: { x: 0.5, y: -0.7, z: -2.5 }, // Updated from x: -1.7 to x: 0.5 (+2.2)
                 motionType: 'crystalline-precise'
             },
             {
@@ -228,7 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.7, z: -3.8 },
+                position: { x: 3.7, y: -0.7, z: -3.8 }, // Updated from x: 1.5 to x: 3.7 (+2.2)
                 motionType: 'fluid-flow'
             }
         ];
@@ -633,12 +633,29 @@
                 const memory = document.getElementById(memoryId);
                 if (memory && memory.getAttribute('visible')) {
                     const currentScale = memory.getAttribute('scale');
+                    
+                    // Handle both object and string scale formats
+                    let scaleX, scaleY, scaleZ;
+                    if (typeof currentScale === 'object' && currentScale !== null) {
+                        scaleX = currentScale.x || 1;
+                        scaleY = currentScale.y || 1;
+                        scaleZ = currentScale.z || 1;
+                    } else {
+                        // Parse string format "x y z" or handle single number
+                        const scaleStr = currentScale ? currentScale.toString() : "1 1 1";
+                        const scaleParts = scaleStr.split(' ');
+                        scaleX = parseFloat(scaleParts[0]) || 1;
+                        scaleY = parseFloat(scaleParts[1]) || scaleX;
+                        scaleZ = parseFloat(scaleParts[2]) || scaleX;
+                    }
+                    
                     const newScale = {
-                        x: Math.max(0.2, Math.min(1.5, currentScale.x * scaleFactor)),
-                        y: Math.max(0.2, Math.min(1.5, currentScale.y * scaleFactor)),
-                        z: Math.max(0.2, Math.min(1.5, currentScale.z * scaleFactor))
+                        x: Math.max(0.2, Math.min(1.5, scaleX * scaleFactor)),
+                        y: Math.max(0.2, Math.min(1.5, scaleY * scaleFactor)),
+                        z: Math.max(0.2, Math.min(1.5, scaleZ * scaleFactor))
                     };
-                    memory.setAttribute('scale', newScale);
+                    
+                    memory.setAttribute('scale', `${newScale.x} ${newScale.y} ${newScale.z}`);
                 }
             });
         }
