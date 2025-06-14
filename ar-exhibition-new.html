@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Gelora:Embodied Alienation</title>
+    <title>Gelora - Awareness</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.js"></script>
@@ -193,7 +193,7 @@
     </div>
 
     <script>
-        // Elemental configuration with updated positions and breathing motion
+        // Elemental configuration arranged in half-circle with characteristic distances
         const elementalMemories = [
             {
                 id: 'wood-gelora',
@@ -201,7 +201,7 @@
                 src: 'east-piece.glb',
                 dotId: 'dotGreen',
                 scale: 0.9,
-                position: { x: 2.2, y: -0.8, z: -1.8 },
+                position: { x: 2.8, y: -0.8, z: -2.2 }, // East position: closer distance (wood grows towards light)
                 motionType: 'organic-growth'
             },
             {
@@ -210,7 +210,7 @@
                 src: 'south-piece.glb',
                 dotId: 'dotPink',
                 scale: 0.48,
-                position: { x: -0.3, y: -0.6, z: -0.5 }, // Moved from x: -0.8 to x: -0.3 (+0.5) for better spacing
+                position: { x: 0, y: -0.6, z: -1.8 }, // South position: closest (fire seeks contact/energy)
                 motionType: 'energetic-burst'
             },
             {
@@ -219,7 +219,7 @@
                 src: 'west-piece.glb',
                 dotId: 'dotWhite',
                 scale: 0.9,
-                position: { x: -2.5, y: -0.7, z: -2.5 }, // Moved from x: -1.7 to x: -2.5 (-0.8) for better spacing
+                position: { x: -2.8, y: -0.7, z: -2.2 }, // West position: closer distance (metal conducts energy)
                 motionType: 'crystalline-precise'
             },
             {
@@ -228,7 +228,7 @@
                 src: 'north-piece.glb',
                 dotId: 'dotBlue',
                 scale: 0.9,
-                position: { x: 1.5, y: -0.84, z: -3.8 }, // Lowered from y: -0.7 to y: -0.84 (20% lower)
+                position: { x: 0, y: -0.84, z: -4.2 }, // North position: furthest (water is patient, flows around)
                 motionType: 'fluid-flow'
             }
         ];
